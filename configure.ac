@@ -1,16 +1,13 @@
 AC_PREREQ(2.54)
 
-AC_INIT(libaosd, 0.0.1, [eugene@raptor.kiev.ua])
+AC_INIT(libaosd, 0.0.1, [bugs+libaosd@atheme.org])
 AC_CONFIG_HEADERS(config.h)
 AM_INIT_AUTOMAKE([1.7])
 
-WARN_CFLAGS=""
 if test "x$GCC" = "xyes"; then
-    WARN_CFLAGS="-Wall -Wpointer-arith -Wstrict-prototypes -Wmissing-prototypes " \
-    "-Wmissing-declarations -Wnested-externs -fno-strict-aliasing"
+    CFLAGS+=" -Wall -Wpointer-arith -Wstrict-prototypes -Wmissing-prototypes"
+    CFLAGS+=" -Wmissing-declarations -Wnested-externs -fno-strict-aliasing"
 fi
-
-CFLAGS="$CFLAGS $WARN_CFLAGS"
 
 AC_PROG_LIBTOOL
 
@@ -31,14 +28,14 @@ AC_ARG_ENABLE(pango,
 )
 
 if test "$enable_pango" = "yes"; then
-    PKG_CHECK_MODULES(pango, pango pangocairo,
+    PKG_CHECK_MODULES(pangoNcairo, pango pangocairo,
 	[
-	 LIBAOSD_PACKAGES+=" pangocairo"
-	 LIBAOSD_CFLAGS+=" $pango_CFLAGS"
-	 LIBAOSD_LIBS+=" $pango_LIBS"
+	 LIBAOSD_PACKAGES+=" pango pangocairo"
+	 LIBAOSD_CFLAGS+=" $pangoNcairo_CFLAGS"
+	 LIBAOSD_LIBS+=" $pangoNcairo_LIBS"
 	],
 	[
-	 AC_MSG_ERROR(can't find pango)
+	 AC_MSG_ERROR(can't find pango or pangocairo)
 	]
     )
 
@@ -50,10 +47,10 @@ AM_CONDITIONAL([PANGO], test "$enable_pango" = "yes")
 
 PKG_CHECK_MODULES(XCOMPOSITE, xcomposite,
     [
-     AC_DEFINE([HAVE_XCOMPOSITE], [], [X Composite extension available])
+     AC_DEFINE([HAVE_XCOMPOSITE], [1], [X Composite extension available])
     ],
     [
-     AC_MSG_RESULT([*** X Composite extension not found, composite support for Audacious OSD will not be compiled ***])
+     AC_MSG_WARN([X Composite extension not found, composite support will not be compiled])
     ]
 )
 
