@@ -63,19 +63,31 @@ else
 fi
 AM_CONDITIONAL([PANGO], test "$enable_pango" = "yes")
 
-PKG_CHECK_MODULES(XCOMPOSITE, xcomposite,
-    [
-     AC_DEFINE([HAVE_XCOMPOSITE], [1], [X Composite extension available])
-    ],
-    [
-     AC_MSG_WARN([X Composite extension not found, composite support will not be compiled])
-    ]
+AC_ARG_ENABLE(xcomposite,
+    [AC_HELP_STRING([--enable-xcomposite], [use X composite (default on)])],
+    [enable_xcomposite=$enableval], [enable_xcomposite="yes"]
 )
+
+if test "$enable_xcomposite" = "yes"; then
+    PKG_CHECK_MODULES(XCOMPOSITE, xcomposite,
+	[
+	 LIBAOSD_PACKAGES+=" xcomposite"
+	 LIBAOSD_CFLAGS+=" $XCOMPOSITE_CFLAGS"
+	 LIBAOSD_LIBS+=" $XCOMPOSITE_LIBS"
+	],
+	[
+	 AC_MSG_ERROR(can't find xcomposite package)
+	]
+    )
+
+    AC_DEFINE([HAVE_XCOMPOSITE], [1], [X Composite extension available])
+else
+    enable_xcomposite="no"
+fi
 
 AC_SUBST(LIBAOSD_PACKAGES)
 AC_SUBST(LIBAOSD_CFLAGS)
 AC_SUBST(LIBAOSD_LIBS)
-
 
 AC_OUTPUT(
     [
