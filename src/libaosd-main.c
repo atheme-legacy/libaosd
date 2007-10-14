@@ -18,7 +18,6 @@
 #include <time.h>
 #include <unistd.h>
 #include <errno.h>
-//#include <gdk/gdk.h>
 
 #include "libaosd.h"
 #include "libaosd-internal.h"

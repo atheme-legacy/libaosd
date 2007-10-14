@@ -9,7 +9,6 @@
  */
 
 #include "config.h"
-//#include "aosd_common.h"
 
 #include <stdio.h>
 #include <stdlib.h>
