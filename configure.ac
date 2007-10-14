@@ -48,6 +48,15 @@ else
 fi
 AM_CONDITIONAL([PANGO], test "$enable_pango" = "yes")
 
+PKG_CHECK_MODULES(XCOMPOSITE, xcomposite,
+    [
+     AC_DEFINE([HAVE_XCOMPOSITE], [], [X Composite extension available])
+    ],
+    [
+     AC_MSG_RESULT([*** X Composite extension not found, composite support for Audacious OSD will not be compiled ***])
+    ]
+)
+
 AC_SUBST(LIBAOSD_PACKAGES)
 AC_SUBST(LIBAOSD_CFLAGS)
 AC_SUBST(LIBAOSD_LIBS)

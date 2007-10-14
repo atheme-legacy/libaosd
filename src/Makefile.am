@@ -17,6 +17,6 @@ sources = libaosd-internal.h libaosd.c libaosd-main.c
 #libaosd_la_SOURCES = $(sources) $(pango_sources)
 #libaosd_la_include_HEADERS = $(headers) $(pango_headers)
 #else
-#libaosd_la_SOURCES = $(sources)
-#libaosd_la_include_HEADERS = $(headers)
+libaosd_la_SOURCES = $(sources)
+libaosd_la_include_HEADERS = $(headers)
 #endif
