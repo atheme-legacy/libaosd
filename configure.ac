@@ -4,6 +4,13 @@ AC_INIT(libaosd, 0.0.1, [bugs+libaosd@atheme.org])
 AC_CONFIG_HEADERS(config.h)
 AM_INIT_AUTOMAKE([1.7])
 
+LT_CURRENT=0
+LT_REVISION=0
+LT_AGE=0
+
+VERSION_INFO="$LT_CURRENT:$LT_REVISION:$LT_AGE"
+AC_SUBST(VERSION_INFO)
+
 if test "x$GCC" = "xyes"; then
     CFLAGS+=" -Wall -Wpointer-arith -Wstrict-prototypes -Wmissing-prototypes"
     CFLAGS+=" -Wmissing-declarations -Wnested-externs -fno-strict-aliasing"
@@ -12,13 +19,13 @@ fi
 AC_PROG_LIBTOOL
 
 LIBAOSD_PACKAGES=cairo
-PKG_CHECK_MODULES(cairo, cairo,
+PKG_CHECK_MODULES(CAIRO, cairo,
     [
-     LIBAOSD_CFLAGS=$cairo_CFLAGS
-     LIBAOSD_LIBS=$cairo_LIBS
+     LIBAOSD_CFLAGS=$CAIRO_CFLAGS
+     LIBAOSD_LIBS=$CAIRO_LIBS
     ],
     [
-     AC_MSG_ERROR(can't find cairo)
+     AC_MSG_ERROR(can't find cairo package)
     ]
 )
 
@@ -28,18 +35,29 @@ AC_ARG_ENABLE(pango,
 )
 
 if test "$enable_pango" = "yes"; then
-    PKG_CHECK_MODULES(pangoNcairo, pango pangocairo,
+    PKG_CHECK_MODULES(PANGO, pango,
 	[
-	 LIBAOSD_PACKAGES+=" pango pangocairo"
-	 LIBAOSD_CFLAGS+=" $pangoNcairo_CFLAGS"
-	 LIBAOSD_LIBS+=" $pangoNcairo_LIBS"
+	 LIBAOSD_PACKAGES+=" pango"
+	 LIBAOSD_CFLAGS+=" $PANGO_CFLAGS"
+	 LIBAOSD_LIBS+=" $PANGO_LIBS"
 	],
 	[
-	 AC_MSG_ERROR(can't find pango or pangocairo)
+	 AC_MSG_ERROR(can't find pango package)
 	]
     )
 
-    AC_DEFINE([HAVE_PANGO], [], [we have pangocairo])
+    PKG_CHECK_MODULES(PANGOCAIRO, pangocairo,
+	[
+	 LIBAOSD_PACKAGES+=" pangocairo"
+	 LIBAOSD_CFLAGS+=" $PANGOCAIRO_CFLAGS"
+	 LIBAOSD_LIBS+=" $PANGOCAIRO_LIBS"
+	],
+	[
+	 AC_MSG_ERROR(can't find pangocairo package)
+	]
+    )
+
+    AC_DEFINE([HAVE_PANGO], [1], [Both pango and pangocairo are available])
 else
     enable_pango="no"
 fi
@@ -57,6 +75,7 @@ PKG_CHECK_MODULES(XCOMPOSITE, xcomposite,
 AC_SUBST(LIBAOSD_PACKAGES)
 AC_SUBST(LIBAOSD_CFLAGS)
 AC_SUBST(LIBAOSD_LIBS)
+
 
 AC_OUTPUT(
     [
