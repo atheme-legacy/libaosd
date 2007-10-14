@@ -4,7 +4,7 @@ libdir=@libdir@
 includedir=@includedir@
 
 Name: libaosd
-Description: X On-Screen Display with cairo and transparency
+Description: An Atheme fork of ghosd with X composite transparency
 Version: @VERSION@
 Requires: @LIBAOSD_PACKAGES@
 Libs: -L${libdir} -laosd
