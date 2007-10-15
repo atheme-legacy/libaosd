@@ -19,8 +19,8 @@
 #include <unistd.h>
 #include <errno.h>
 
-#include "libaosd.h"
-#include "libaosd-internal.h"
+#include "aosd.h"
+#include "aosd-internal.h"
 
 static void
 ghosd_main_iteration(Ghosd *ghosd) {

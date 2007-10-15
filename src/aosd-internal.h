@@ -10,7 +10,7 @@
 
 #include <X11/Xlib.h>
 
-#include "libaosd.h"
+#include "aosd.h"
 
 typedef struct {
   GhosdRenderFunc func;

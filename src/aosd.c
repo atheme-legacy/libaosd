@@ -20,8 +20,8 @@
 #include <X11/extensions/Xcomposite.h>
 #endif
 
-#include "libaosd.h"
-#include "libaosd-internal.h"
+#include "aosd.h"
+#include "aosd-internal.h"
 
 static unsigned long
 get_current_workspace(Ghosd *ghosd) {

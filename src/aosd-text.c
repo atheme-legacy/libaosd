@@ -5,8 +5,9 @@
 #include "config.h"
 
 #include <pango/pangocairo.h>
-#include "libaosd-internal.h"
-#include "libaosd-text.h"
+
+#include "aosd-internal.h"
+#include "aosd-text.h"
 
 static void
 render_text(Ghosd *ghosd, cairo_t *cr, void* data) {
