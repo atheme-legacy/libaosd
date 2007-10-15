@@ -1,3 +1,5 @@
+EXTRA_DIST = aosd-internal.h
+
 lib_LTLIBRARIES = libaosd.la
 
 INCLUDES = ${LIBAOSD_CFLAGS}
