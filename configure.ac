@@ -30,41 +30,38 @@ PKG_CHECK_MODULES(CAIRO, cairo,
 )
 
 AC_ARG_ENABLE(pango,
-    [AC_HELP_STRING([--enable-pango], [use pango (default on)])],
+    [AC_HELP_STRING([--disable-pango], [avoid using pango (default=autodetect)])],
     [enable_pango=$enableval], [enable_pango="yes"]
 )
 
 if test "$enable_pango" = "yes"; then
     PKG_CHECK_MODULES(PANGO, pango,
 	[
-	 LIBAOSD_PACKAGES+=" pango"
-	 LIBAOSD_CFLAGS+=" $PANGO_CFLAGS"
-	 LIBAOSD_LIBS+=" $PANGO_LIBS"
+	 PKG_CHECK_MODULES(PANGOCAIRO, pangocairo,
+	    [
+	     LIBAOSD_PACKAGES+=" pango pangocairo"
+	     LIBAOSD_CFLAGS+=" $PANGO_CFLAGS $PANGOCAIRO_CFLAGS"
+	     LIBAOSD_LIBS+=" $PANGO_LIBS $PANGOCAIRO_LIBS"
+	     AC_DEFINE([HAVE_PANGO], [1], [Both pango and pangocairo are available])
+	    ],
+	    [
+	     AC_MSG_WARN(can't find pangocairo package)
+	     enable_pango="no"
+	    ]
+	 )
 	],
 	[
-	 AC_MSG_ERROR(can't find pango package)
+	 AC_MSG_WARN(can't find pango package)
+	 enable_pango="no"
 	]
     )
-
-    PKG_CHECK_MODULES(PANGOCAIRO, pangocairo,
-	[
-	 LIBAOSD_PACKAGES+=" pangocairo"
-	 LIBAOSD_CFLAGS+=" $PANGOCAIRO_CFLAGS"
-	 LIBAOSD_LIBS+=" $PANGOCAIRO_LIBS"
-	],
-	[
-	 AC_MSG_ERROR(can't find pangocairo package)
-	]
-    )
-
-    AC_DEFINE([HAVE_PANGO], [1], [Both pango and pangocairo are available])
 else
     enable_pango="no"
 fi
 AM_CONDITIONAL([PANGO], test "$enable_pango" = "yes")
 
 AC_ARG_ENABLE(xcomposite,
-    [AC_HELP_STRING([--enable-xcomposite], [use X composite (default on)])],
+    [AC_HELP_STRING([--disable-xcomposite], [avoid using X composite (default=autodetect)])],
     [enable_xcomposite=$enableval], [enable_xcomposite="yes"]
 )
 
@@ -74,13 +71,12 @@ if test "$enable_xcomposite" = "yes"; then
 	 LIBAOSD_PACKAGES+=" xcomposite"
 	 LIBAOSD_CFLAGS+=" $XCOMPOSITE_CFLAGS"
 	 LIBAOSD_LIBS+=" $XCOMPOSITE_LIBS"
+	 AC_DEFINE([HAVE_XCOMPOSITE], [1], [X Composite extension available])
 	],
 	[
-	 AC_MSG_ERROR(can't find xcomposite package)
+	 AC_MSG_WARN(can't find xcomposite package)
 	]
     )
-
-    AC_DEFINE([HAVE_XCOMPOSITE], [1], [X Composite extension available])
 else
     enable_xcomposite="no"
 fi
