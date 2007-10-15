@@ -6,7 +6,7 @@ libaosd_la_LIBADD = ${LIBAOSD_LIBS}
 libaosd_la_LDFLAGS = -version-info @VERSION_INFO@
 libaosd_la_includedir = ${includedir}/aosd
 
-sources = libaosd.c libaosd-main.c libaosd-internal.h
+sources = libaosd.c libaosd-main.c
 headers = libaosd.h
 
 if PANGO
