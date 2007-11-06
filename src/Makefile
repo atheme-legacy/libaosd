@@ -11,4 +11,4 @@ SRCS += ${AUX_PANGO_SRCS}
 
 include ../buildsys.mk
 
-CPPFLAGS += ${LIB_CFLAGS} -I..
+CPPFLAGS += ${LIB_CPPFLAGS} ${AUX_CFLAGS} -I..

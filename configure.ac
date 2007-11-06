@@ -29,8 +29,8 @@ LIBS="$LIBS $DYNAMIC_LD_LIBS"
 PKG_CHECK_MODULES(CAIRO, cairo,
     [
      PACKAGES=cairo
-     LIB_CFLAGS=$CAIRO_CFLAGS
-     LIB_LDFLAGS=$CAIRO_LIBS
+     AUX_CFLAGS=$CAIRO_CFLAGS
+     AUX_LDFLAGS=$CAIRO_LIBS
     ],
     [
      AC_MSG_ERROR(can't find cairo package)
@@ -48,8 +48,8 @@ if test "$enable_pango" = "yes"; then
 	 PKG_CHECK_MODULES(PANGOCAIRO, pangocairo,
 	    [
 	     PACKAGES+=" pango pangocairo"
-	     LIB_CFLAGS+=" $PANGO_CFLAGS $PANGOCAIRO_CFLAGS"
-	     LIB_LDFLAGS+=" $PANGO_LIBS $PANGOCAIRO_LIBS"
+	     AUX_CFLAGS+=" $PANGO_CFLAGS $PANGOCAIRO_CFLAGS"
+	     AUX_LDFLAGS+=" $PANGO_LIBS $PANGOCAIRO_LIBS"
 	     AC_DEFINE([HAVE_PANGO], [1], [Both pango and pangocairo are available])
 	     AUX_PANGO_SRCS=aosd-text.c
 	    ],
@@ -77,8 +77,8 @@ if test "$enable_xcomposite" = "yes"; then
     PKG_CHECK_MODULES(XCOMPOSITE, xcomposite,
 	[
 	 PACKAGES+=" xcomposite"
-	 LIB_CFLAGS+=" $XCOMPOSITE_CFLAGS"
-	 LIB_LDFLAGS+=" $XCOMPOSITE_LIBS"
+	 AUX_CFLAGS+=" $XCOMPOSITE_CFLAGS"
+	 AUX_LDFLAGS+=" $XCOMPOSITE_LIBS"
 	 AC_DEFINE([HAVE_XCOMPOSITE], [1], [X Composite extension available])
 	],
 	[
@@ -90,8 +90,8 @@ else
 fi
 
 AC_SUBST(PACKAGES)
-AC_SUBST(LIB_CFLAGS)
-AC_SUBST(LIB_LDFLAGS)
+AC_SUBST(AUX_CFLAGS)
+AC_SUBST(AUX_LDFLAGS)
 AC_SUBST(AUX_PANGO_SRCS)
 
 AC_CONFIG_FILES(
