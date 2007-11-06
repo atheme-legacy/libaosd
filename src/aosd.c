@@ -23,6 +23,7 @@
 #include "aosd.h"
 #include "aosd-internal.h"
 
+#if 0
 static unsigned long
 get_current_workspace(Ghosd *ghosd) {
   Atom cur_workspace_atom;
@@ -46,6 +47,7 @@ get_current_workspace(Ghosd *ghosd) {
   /* fall back to desktop number 0 */
   return 0;
 }
+#endif
 
 #ifdef HAVE_XCOMPOSITE
 static Bool

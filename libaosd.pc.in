@@ -5,7 +5,7 @@ includedir=@includedir@
 
 Name: libaosd
 Description: An Atheme fork of ghosd with X composite transparency
-Version: @VERSION@
-Requires: @LIBAOSD_PACKAGES@
+Version: @PACKAGE_VERSION@
+Requires: @PACKAGES@
 Libs: -L${libdir} -laosd
 Cflags: -I${includedir}/aosd

@@ -1,28 +1,36 @@
 AC_PREREQ(2.54)
 
-AC_INIT(libaosd, 0.0.1, [bugs+libaosd@atheme.org])
-AC_CONFIG_HEADERS(config.h)
-AM_INIT_AUTOMAKE([1.7])
+AC_INIT([libaosd], [0.0.1], [bugs+libaosd@atheme.org])
+AC_CONFIG_HEADER([config.h])
 
-LT_CURRENT=0
-LT_REVISION=1
-LT_AGE=0
+AC_CANONICAL_HOST
+AC_CANONICAL_TARGET
 
-VERSION_INFO="$LT_CURRENT:$LT_REVISION:$LT_AGE"
-AC_SUBST(VERSION_INFO)
+# Checks for programs.
+AC_PROG_CC
+AC_PROG_CPP
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+AC_ISC_POSIX
 
 if test "x$GCC" = "xyes"; then
     CFLAGS+=" -Wall -Wpointer-arith -Wstrict-prototypes -Wmissing-prototypes"
     CFLAGS+=" -Wmissing-declarations -Wnested-externs -fno-strict-aliasing"
 fi
 
-AC_PROG_LIBTOOL
+# XXX workaround
+PACKAGE="libaosd"
+AC_SUBST(PACKAGE)
 
-LIBAOSD_PACKAGES=cairo
+# Checks for libraries.
+BUILDSYS_SHARED_LIB
+LIBS="$LIBS $DYNAMIC_LD_LIBS"
+
 PKG_CHECK_MODULES(CAIRO, cairo,
     [
-     LIBAOSD_CFLAGS=$CAIRO_CFLAGS
-     LIBAOSD_LIBS=$CAIRO_LIBS
+     PACKAGES=cairo
+     LIB_CFLAGS=$CAIRO_CFLAGS
+     LIB_LDFLAGS=$CAIRO_LIBS
     ],
     [
      AC_MSG_ERROR(can't find cairo package)
@@ -39,10 +47,11 @@ if test "$enable_pango" = "yes"; then
 	[
 	 PKG_CHECK_MODULES(PANGOCAIRO, pangocairo,
 	    [
-	     LIBAOSD_PACKAGES+=" pango pangocairo"
-	     LIBAOSD_CFLAGS+=" $PANGO_CFLAGS $PANGOCAIRO_CFLAGS"
-	     LIBAOSD_LIBS+=" $PANGO_LIBS $PANGOCAIRO_LIBS"
+	     PACKAGES+=" pango pangocairo"
+	     LIB_CFLAGS+=" $PANGO_CFLAGS $PANGOCAIRO_CFLAGS"
+	     LIB_LDFLAGS+=" $PANGO_LIBS $PANGOCAIRO_LIBS"
 	     AC_DEFINE([HAVE_PANGO], [1], [Both pango and pangocairo are available])
+	     AUX_PANGO_SRCS=aosd-text.c
 	    ],
 	    [
 	     AC_MSG_WARN(can't find pangocairo package)
@@ -58,7 +67,6 @@ if test "$enable_pango" = "yes"; then
 else
     enable_pango="no"
 fi
-AM_CONDITIONAL([PANGO], test "$enable_pango" = "yes")
 
 AC_ARG_ENABLE(xcomposite,
     [AC_HELP_STRING([--disable-xcomposite], [avoid using X composite (default=autodetect)])],
@@ -68,9 +76,9 @@ AC_ARG_ENABLE(xcomposite,
 if test "$enable_xcomposite" = "yes"; then
     PKG_CHECK_MODULES(XCOMPOSITE, xcomposite,
 	[
-	 LIBAOSD_PACKAGES+=" xcomposite"
-	 LIBAOSD_CFLAGS+=" $XCOMPOSITE_CFLAGS"
-	 LIBAOSD_LIBS+=" $XCOMPOSITE_LIBS"
+	 PACKAGES+=" xcomposite"
+	 LIB_CFLAGS+=" $XCOMPOSITE_CFLAGS"
+	 LIB_LDFLAGS+=" $XCOMPOSITE_LIBS"
 	 AC_DEFINE([HAVE_XCOMPOSITE], [1], [X Composite extension available])
 	],
 	[
@@ -81,14 +89,16 @@ else
     enable_xcomposite="no"
 fi
 
-AC_SUBST(LIBAOSD_PACKAGES)
-AC_SUBST(LIBAOSD_CFLAGS)
-AC_SUBST(LIBAOSD_LIBS)
+AC_SUBST(PACKAGES)
+AC_SUBST(LIB_CFLAGS)
+AC_SUBST(LIB_LDFLAGS)
+AC_SUBST(AUX_PANGO_SRCS)
 
-AC_OUTPUT(
+AC_CONFIG_FILES(
     [
-     Makefile
-     src/Makefile
+     buildsys.mk
+     extra.mk
      libaosd.pc
     ]
 )
+AC_OUTPUT
