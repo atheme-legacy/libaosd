@@ -1,5 +1,5 @@
 SUBDIRS = src
-DISTCLEAN = buildsys.mk config.h config.log config.status extra.mk libaosd.pc
+DISTCLEAN = autom4te.cache aclocal.m4 buildsys.mk config.h config.log config.status extra.mk libaosd.pc
 EXTRA = libaosd.pc
 
 include buildsys.mk
