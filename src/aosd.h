@@ -1,63 +1,82 @@
-/* ghosd -- OSD with fake transparency, cairo, and pango.
+/* aosd -- OSD with transparency, cairo, and pango.
+ *
  * Copyright (C) 2006 Evan Martin <martine@danga.com>
  *
  * With further development by Giacomo Lozito <james@develia.org>
- * for the ghosd-based Audacious OSD
  * - added real transparency with X Composite Extension
  * - added mouse event handling on OSD window
  * - added/changed some other stuff
  */
 
-#ifndef __GHOSD_H__
-#define __GHOSD_H__
+#ifndef __AOSD_H__
+#define __AOSD_H__
 
 #include <cairo/cairo.h>
 
 #include <limits.h>  /* INT_MAX */
 #include <sys/time.h>  /* timeval */
 
-typedef struct _Ghosd Ghosd;
+/* global object type */
+typedef struct _Aosd Aosd;
 
-/* minimal struct to handle button events */
+#define AOSD_COORD_CENTER INT_MAX
+
+/* minimal struct to handle mouse events */
 typedef struct
 {
+  // relative coordinates
   int x, y;
-  int send_event;
+  // global coordinates
   int x_root, y_root;
+
+  // whether we should send the event further
+  int send_event;
+
+  // button being pressed
   unsigned int button;
   unsigned long time;
 }
-GhosdEventButton;
+AosdMouseEvent;
 
-typedef void (*GhosdRenderFunc)(Ghosd *ghosd, cairo_t *cr, void *user_data);
-typedef void (*GhosdEventButtonCb)(Ghosd *ghosd, GhosdEventButton *event, void *user_data);
+/* various callbacks */
+typedef void (*AosdRenderer)(Aosd* aosd, cairo_t* cr, void* user_data);
+typedef void (*AosdMouseEventCb)(Aosd* aosd, AosdMouseEvent* event,
+                                 void* user_data);
 
-Ghosd *ghosd_new(void);
-void   ghosd_destroy(Ghosd* ghosd);
 #ifdef HAVE_XCOMPOSITE
-Ghosd *ghosd_new_with_argbvisual(void);
-int ghosd_check_composite_ext(void);
-int ghosd_check_composite_mgr(void);
+/* composite checkers */
+int aosd_check_composite_ext(void);
+int aosd_check_composite_mgr(void);
 #endif
 
-#define GHOSD_COORD_CENTER INT_MAX
-void ghosd_set_transparent(Ghosd *ghosd, int transparent);
-void ghosd_set_position(Ghosd *ghosd, int x, int y, int width, int height);
-void ghosd_set_render(Ghosd *ghosd, GhosdRenderFunc render_func,
-                      void* user_data, void (*user_data_d)(void*));
+/* object allocators */
+Aosd* aosd_new(void);
+#ifdef HAVE_XCOMPOSITE
+Aosd* aosd_new_argb(void);
+#endif
 
-void ghosd_render(Ghosd *ghosd);
-void ghosd_show(Ghosd *ghosd);
-void ghosd_hide(Ghosd *ghosd);
+/* object deallocator */
+void aosd_destroy(Aosd* aosd);
 
-void ghosd_set_event_button_cb(Ghosd *ghosd, GhosdEventButtonCb cb, void *user_data );
+int aosd_get_socket(Aosd* aosd);
 
-void ghosd_main_iterations(Ghosd *ghosd);
-void ghosd_main_until(Ghosd *ghosd, struct timeval *until);
-void ghosd_flash(Ghosd *ghosd, int fade_ms, int total_display_ms);
+/* object configurators */
+void aosd_set_transparent(Aosd* aosd, int transparent);
+void aosd_set_position(Aosd* aosd, int x, int y, int width, int height);
+void aosd_set_renderer(Aosd* aosd, AosdRenderer renderer, void* user_data,
+                       void (*user_data_d)(void*));
+void aosd_set_mouse_event_cb(Aosd* aosd, AosdMouseEventCb cb, void* user_data);
 
-int ghosd_get_socket(Ghosd *ghosd);
+/* manual object manipulators */
+void aosd_render(Aosd* aosd);
+void aosd_show(Aosd* aosd);
+void aosd_hide(Aosd* aosd);
 
-#endif /* __GHOSD_H__ */
+/* automatic object manipulators */
+void aosd_main_iterations(Aosd* aosd);
+void aosd_main_until(Aosd* aosd, struct timeval* until);
+void aosd_flash(Aosd* aosd, int fade_ms, int total_display_ms);
+
+#endif /* __AOSD_H__ */
 
 /* vim: set ts=2 sw=2 et cino=(0 : */

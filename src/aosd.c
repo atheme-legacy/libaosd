@@ -1,8 +1,8 @@
-/* ghosd -- OSD with fake transparency, cairo, and pango.
+/* aosd -- OSD with transparency, cairo, and pango.
+ *
  * Copyright (C) 2006 Evan Martin <martine@danga.com>
  *
  * With further development by Giacomo Lozito <james@develia.org>
- * for the ghosd-based Audacious OSD
  * - added real transparency with X Composite Extension
  * - added mouse event handling on OSD window
  * - added/changed some other stuff
@@ -20,184 +20,361 @@
 #include <X11/extensions/Xcomposite.h>
 #endif
 
-#include "aosd.h"
 #include "aosd-internal.h"
 
-#if 0
-static unsigned long
-get_current_workspace(Ghosd *ghosd) {
-  Atom cur_workspace_atom;
-  Atom type;
-  int format;
-  unsigned long nitems, bytes_after;
-  unsigned char *data;
 
-  cur_workspace_atom = XInternAtom(ghosd->dpy, "_NET_CURRENT_DESKTOP", False);
-  XGetWindowProperty(ghosd->dpy, DefaultRootWindow(ghosd->dpy), cur_workspace_atom,
-    0, ULONG_MAX, False, XA_CARDINAL, &type, &format, &nitems, &bytes_after, &data);
-
-  if ( type == XA_CARDINAL )
-  {
-    unsigned long cur_workspace = (unsigned long)*data;
-    g_print("debug: %i\n", cur_workspace);
-    XFree( data );
-    return cur_workspace;
-  }
-
-  /* fall back to desktop number 0 */
-  return 0;
-}
-#endif
+/* helpers forward declarations */
+static Display* aosd_get_display(void);
+static Window make_window(Display*, Window, Visual*, Colormap, Bool);
+static void set_hints(Display*, Window);
+static Pixmap take_snapshot(Aosd*);
+static Aosd* aosd_internal_new(Display*, Bool);
 
 #ifdef HAVE_XCOMPOSITE
-static Bool
-composite_find_manager(Display *dpy, int scr)
+int
+aosd_check_composite_ext(void)
 {
+  Display* dsp = aosd_get_display();
+  int result, event_base, error_base;
+  
+  if (dsp == NULL)
+    return 0;
+  
+  result = XCompositeQueryExtension(dsp, &event_base, &error_base);
+
+  XCloseDisplay(dsp);
+  return result;
+}
+
+int
+aosd_check_composite_mgr(void)
+{
+  Display *dsp = aosd_get_display();
   Atom comp_manager_atom;
   char comp_manager_hint[32];
   Window win;
   
-  snprintf(comp_manager_hint, 32, "_NET_WM_CM_S%d", scr);
-  comp_manager_atom = XInternAtom(dpy, comp_manager_hint, False);
-  win = XGetSelectionOwner(dpy, comp_manager_atom);
+  if (dsp == NULL)
+    return 0;
   
-  if (win != None)
-  {
-    return True;
-  }
-  else
-  {
-    return False;
-  }
+  snprintf(comp_manager_hint, 32, "_NET_WM_CM_S%d", DefaultScreen(dsp));
+  comp_manager_atom = XInternAtom(dsp, comp_manager_hint, False);
+  win = XGetSelectionOwner(dsp, comp_manager_atom);
+  
+  XCloseDisplay(dsp);
+  return (win != None);
 }
+#endif
 
-static Visual *
-composite_find_argb_visual(Display *dpy, int scr)
+#ifdef HAVE_XCOMPOSITE
+static Visual*
+composite_find_argb_visual(Display* dsp, int scr)
 {
-  XVisualInfo	*xvi;
+  XVisualInfo* xvi;
   XVisualInfo	template;
   int nvi, i;
-  XRenderPictFormat *format;
-  Visual *visual;
+  XRenderPictFormat* format;
+  Visual* visual = NULL;
 
   template.screen = scr;
   template.depth = 32;
   template.class = TrueColor;
-  xvi = XGetVisualInfo (dpy, 
-          VisualScreenMask | VisualDepthMask | VisualClassMask,
-          &template, &nvi);
+
+  xvi = XGetVisualInfo(dsp,
+                       VisualScreenMask | VisualDepthMask | VisualClassMask,
+                       &template, &nvi);
   if (xvi == NULL)
     return NULL;
 
-  visual = NULL;
   for (i = 0; i < nvi; i++)
   {
-    format = XRenderFindVisualFormat (dpy, xvi[i].visual);
-    if (format->type == PictTypeDirect && format->direct.alphaMask)
+    format = XRenderFindVisualFormat(dsp, xvi[i].visual);
+    if (format->type == PictTypeDirect &&
+        format->direct.alphaMask)
     {
       visual = xvi[i].visual;
       break;
     }
   }
-  XFree (xvi);
-  
+
+  XFree (xvi);  
   return visual;
 }
 #endif
 
-static Pixmap
-take_snapshot(Ghosd *ghosd) {
-  Pixmap pixmap;
-  GC gc;
+Aosd*
+aosd_new(void)
+{
+  Display* dsp = aosd_get_display();
 
-  /* create a pixmap to hold the screenshot. */
-  pixmap = XCreatePixmap(ghosd->dpy, ghosd->win,
-                         ghosd->width, ghosd->height,
-                         DefaultDepth(ghosd->dpy, DefaultScreen(ghosd->dpy)));
+  if (dsp == NULL)
+    return NULL;
 
-  /* then copy the screen into the pixmap. */
-  gc = XCreateGC(ghosd->dpy, pixmap, 0, NULL);
-  XSetSubwindowMode(ghosd->dpy, gc, IncludeInferiors);
-  XCopyArea(ghosd->dpy, DefaultRootWindow(ghosd->dpy), pixmap, gc,
-            ghosd->x, ghosd->y, ghosd->width, ghosd->height,
-            0, 0);
-  XSetSubwindowMode(ghosd->dpy, gc, ClipByChildren);
-  XFreeGC(ghosd->dpy, gc);
+  return aosd_internal_new(dsp, False);
+}
 
-  return pixmap;
+#ifdef HAVE_XCOMPOSITE
+Aosd*
+aosd_new_argb(void)
+{
+  Display* dsp = aosd_get_display();
+
+  if (dsp == NULL)
+    return NULL;
+
+  return aosd_internal_new(dsp, True);
+}
+#endif
+
+void
+aosd_destroy(Aosd* aosd)
+{
+  if (aosd->background.set)
+  {
+    XFreePixmap(aosd->display, aosd->background.pixmap);
+    aosd->background.set = 0;
+  }
+
+  if (aosd->composite)
+    XFreeColormap(aosd->display, aosd->colormap);
+
+  XDestroyWindow(aosd->display, aosd->win);
+  XCloseDisplay(aosd->display);
+  free(aosd);
+}
+
+int
+aosd_get_socket(Aosd* aosd)
+{
+  return ConnectionNumber(aosd->display);
 }
 
 void
-ghosd_render(Ghosd *ghosd) {
+aosd_set_transparent(Aosd* aosd, int transparent)
+{
+  aosd->transparent = (transparent != 0);
+}
+
+void
+aosd_set_position(Aosd* aosd, int x, int y, int width, int height)
+{
+  Display* dsp = aosd->display;
+  int scr = DefaultScreen(dsp);
+  const int dsp_width  = DisplayWidth(dsp, scr);
+  const int dsp_height = DisplayHeight(dsp, scr);
+
+  if (x == AOSD_COORD_CENTER)
+    x = (dsp_width - width) / 2;
+  else if (x < 0)
+    x = (dsp_width - width) + x;
+
+  if (y == AOSD_COORD_CENTER)
+    y = (dsp_height - height) / 2;
+  else if (y < 0)
+    y = (dsp_height - height) + y;
+
+  aosd->x      = x;
+  aosd->y      = y;
+  aosd->width  = width;
+  aosd->height = height;
+
+  XMoveResizeWindow(dsp, aosd->win, x, y, width, height);
+}
+
+void
+aosd_set_renderer(Aosd* aosd, AosdRenderer renderer,
+                  void* user_data, void (*user_data_d)(void*))
+{
+  aosd->renderer.render_cb = renderer;
+  aosd->renderer.data = user_data;
+  aosd->renderer.data_destroyer = user_data_d;
+}
+
+void
+aosd_set_mouse_event_cb(Aosd* aosd, AosdMouseEventCb cb, void* user_data)
+{
+  aosd->mouse_processor.mouse_event_cb = cb;
+  aosd->mouse_processor.data = user_data;
+}
+
+void
+aosd_render(Aosd* aosd)
+{
+  Display* dsp = aosd->display;
+  int width = aosd->width, height = aosd->height;
+  Window win = aosd->win;
   Pixmap pixmap;
   GC gc;
 
-  if (ghosd->composite)
+  if (aosd->composite)
   {
-    pixmap = XCreatePixmap(ghosd->dpy, ghosd->win, ghosd->width, ghosd->height, 32);
-    gc = XCreateGC(ghosd->dpy, pixmap, 0, NULL);
-    XFillRectangle(ghosd->dpy, pixmap, gc,
-      0, 0, ghosd->width, ghosd->height);
+    pixmap = XCreatePixmap(dsp, win, width, height, 32);
+    gc = XCreateGC(dsp, pixmap, 0, NULL);
+    XFillRectangle(dsp, pixmap, gc, 0, 0, width, height);
   }
   else
   {
-    pixmap = XCreatePixmap(ghosd->dpy, ghosd->win, ghosd->width, ghosd->height,
-      DefaultDepth(ghosd->dpy, DefaultScreen(ghosd->dpy)));
-    gc = XCreateGC(ghosd->dpy, pixmap, 0, NULL);
-    if (ghosd->transparent) {
-      /* make our own copy of the background pixmap as the initial surface. */
-      XCopyArea(ghosd->dpy, ghosd->background.pixmap, pixmap, gc,
-        0, 0, ghosd->width, ghosd->height, 0, 0);
-    } else {
-      XFillRectangle(ghosd->dpy, pixmap, gc,
-        0, 0, ghosd->width, ghosd->height);
-    }
+    pixmap = XCreatePixmap(dsp, win, width, height,
+                           DefaultDepth(dsp, DefaultScreen(dsp)));
+    gc = XCreateGC(dsp, pixmap, 0, NULL);
+    if (aosd->transparent)
+      /* make our own copy of the background pixmap as the initial surface */
+      XCopyArea(dsp, aosd->background.pixmap, pixmap, gc,
+                0, 0, width, height, 0, 0);
+    else
+      XFillRectangle(dsp, pixmap, gc, 0, 0, width, height);
   }
-  XFreeGC(ghosd->dpy, gc);
+  XFreeGC(dsp, gc);
 
-  /* render with cairo. */
-  if (ghosd->render.func) {
-    /* create cairo surface using the pixmap. */
-    XRenderPictFormat *xrformat;
-    cairo_surface_t *surf;
-    if (ghosd->composite) {
-      xrformat = XRenderFindVisualFormat(ghosd->dpy, ghosd->visual);
+  /* render with cairo */
+  if (aosd->renderer.render_cb)
+  {
+    /* create cairo surface using the pixmap */
+    XRenderPictFormat* xrformat;
+    cairo_surface_t* surf;
+    if (aosd->composite)
+    {
+      xrformat = XRenderFindVisualFormat(dsp, aosd->visual);
       surf = cairo_xlib_surface_create_with_xrender_format(
-               ghosd->dpy, pixmap,
-               ScreenOfDisplay(ghosd->dpy, ghosd->screen_num),
-               xrformat, ghosd->width, ghosd->height);
-    } else {
-      xrformat = XRenderFindVisualFormat(ghosd->dpy,
-                   DefaultVisual(ghosd->dpy, DefaultScreen(ghosd->dpy)));
+             dsp, pixmap, ScreenOfDisplay(dsp, aosd->screen_num),
+             xrformat, width, height);
+    }
+    else
+    {
+      xrformat = XRenderFindVisualFormat(dsp,
+             DefaultVisual(dsp, DefaultScreen(dsp)));
       surf = cairo_xlib_surface_create_with_xrender_format(
-               ghosd->dpy, pixmap,
-               ScreenOfDisplay(ghosd->dpy, DefaultScreen(ghosd->dpy)),
-               xrformat, ghosd->width, ghosd->height);
+             dsp, pixmap, ScreenOfDisplay(dsp, DefaultScreen(dsp)),
+             xrformat, width, height);
     }
 
-    /* draw some stuff. */
-    cairo_t *cr = cairo_create(surf);
-    ghosd->render.func(ghosd, cr, ghosd->render.data);
+    /* draw some stuff */
+    cairo_t* cr = cairo_create(surf);
+    aosd->renderer.render_cb(aosd, cr, aosd->renderer.data);
     cairo_destroy(cr);
     cairo_surface_destroy(surf);
   }
 
-  /* point window at its new backing pixmap. */
-  XSetWindowBackgroundPixmap(ghosd->dpy, ghosd->win, pixmap);
+  /* point window at its new backing pixmap */
+  XSetWindowBackgroundPixmap(dsp, win, pixmap);
+
   /* I think it's ok to free it here because XCreatePixmap(3X11) says: "the X
    * server frees the pixmap storage when there are no references to it".
    */
-  XFreePixmap(ghosd->dpy, pixmap);
+  XFreePixmap(dsp, pixmap);
 
-  /* and tell the window to redraw with this pixmap. */
-  XClearWindow(ghosd->dpy, ghosd->win);
+  /* and tell the window to redraw with this pixmap */
+  XClearWindow(dsp, win);
+}
+
+void
+aosd_show(Aosd* aosd)
+{
+  if (!aosd->composite &&
+      aosd->transparent)
+  {
+    if (aosd->background.set)
+    {
+      XFreePixmap(aosd->display, aosd->background.pixmap);
+      aosd->background.set = 0;
+    }
+    aosd->background.pixmap = take_snapshot(aosd);
+    aosd->background.set = 1;
+  }
+
+  aosd_render(aosd);
+  XMapRaised(aosd->display, aosd->win);
+}
+
+void
+aosd_hide(Aosd* aosd)
+{
+  XUnmapWindow(aosd->display, aosd->win);
+}
+
+
+
+
+/* internal helpers */
+static Display*
+aosd_get_display(void)
+{
+  Display* dsp = XOpenDisplay(NULL);
+
+  if (dsp == NULL)
+    fprintf(stderr, "libaosd: Couldn't open the display.\n");
+
+  return dsp;
+}
+
+Aosd*
+aosd_internal_new(Display* dsp, Bool argb)
+{
+  Aosd* aosd;
+  int screen_num = DefaultScreen(dsp);
+  Window win, root_win = DefaultRootWindow(dsp);
+  Visual* visual = NULL;
+  Colormap colormap = None;
+
+#ifdef HAVE_XCOMPOSITE
+  if (argb)
+  {
+    visual = composite_find_argb_visual(dsp, screen_num);
+    if (visual == NULL)
+      return NULL;
+    colormap = XCreateColormap(dsp, root_win, visual, AllocNone);
+  }
+#endif
+
+  win = make_window(dsp, root_win, visual, colormap, argb);
+
+  aosd = calloc(1, sizeof(Aosd));
+  aosd->display = dsp;
+  aosd->visual = visual;
+  aosd->colormap = colormap;
+  aosd->win = win;
+  aosd->root_win = root_win;
+  aosd->screen_num = screen_num;
+  aosd->transparent = 1;
+  aosd->composite = argb ? 1 : 0;
+  aosd->mouse_processor.mouse_event_cb = NULL;
+  aosd->background.set = 0;
+
+  return aosd;
+}
+
+static Pixmap
+take_snapshot(Aosd* aosd)
+{
+  Display* dsp = aosd->display;
+  int width = aosd->width, height = aosd->height;
+  Pixmap pixmap;
+  GC gc;
+
+  /* create a pixmap to hold the screenshot */
+  pixmap = XCreatePixmap(dsp, aosd->win, width, height,
+                         DefaultDepth(dsp, DefaultScreen(dsp)));
+
+  /* then copy the screen into the pixmap */
+  gc = XCreateGC(dsp, pixmap, 0, NULL);
+  XSetSubwindowMode(dsp, gc, IncludeInferiors);
+  XCopyArea(dsp, DefaultRootWindow(dsp), pixmap, gc,
+            aosd->x, aosd->y, width, height, 0, 0);
+  XSetSubwindowMode(dsp, gc, ClipByChildren);
+  XFreeGC(dsp, gc);
+
+  return pixmap;
 }
 
 static void
-set_hints(Display *dpy, Window win) {
-  XClassHint *classhints;
-  char *res_class = "Audacious";
-  char *res_name = "aosd";
+set_hints(Display* dsp, Window win)
+{
+  // XXX: Should these be set externally by the users?
+  XClassHint* classhints = XAllocClassHint();
+  classhints->res_class = "Atheme";
+  classhints->res_name = "aosd";
+  XSetClassHint(dsp, win, classhints);
+  XFree(classhints);
 
   /* we're almost a _NET_WM_WINDOW_TYPE_SPLASH, but we don't want
    * to be centered on the screen.  instead, manually request the
@@ -205,49 +382,31 @@ set_hints(Display *dpy, Window win) {
 
   /* turn off window decorations.
    * we could pull this in from a motif header, but it's easier to
-   * use this snippet i found on a mailing list.  */
-  Atom mwm_hints = XInternAtom(dpy, "_MOTIF_WM_HINTS", False);
-#define MWM_HINTS_DECORATIONS (1<<1)
+   * use this snippet i found on a mailing list. */
+  Atom mwm_hints = XInternAtom(dsp, "_MOTIF_WM_HINTS", False);
   struct {
     long flags, functions, decorations, input_mode;
-  } mwm_hints_setting = {
-    MWM_HINTS_DECORATIONS, 0, 0, 0
-  };
-  XChangeProperty(dpy, win,
+  } mwm_hints_setting = { 1<<1, 0, 0, 0 };
+
+  XChangeProperty(dsp, win,
     mwm_hints, mwm_hints, 32, PropModeReplace,
     (unsigned char *)&mwm_hints_setting, 4);
 
   /* always on top, not in taskbar or pager. */
-  Atom win_state = XInternAtom(dpy, "_NET_WM_STATE", False);
-  Atom win_state_setting[] = {
-    XInternAtom(dpy, "_NET_WM_STATE_ABOVE", False),
-    XInternAtom(dpy, "_NET_WM_STATE_SKIP_TASKBAR", False),
-    XInternAtom(dpy, "_NET_WM_STATE_SKIP_PAGER", False)
+  Atom win_state = XInternAtom(dsp, "_NET_WM_STATE", False);
+  Atom win_state_setting[] =
+  {
+    XInternAtom(dsp, "_NET_WM_STATE_ABOVE", False),
+    XInternAtom(dsp, "_NET_WM_STATE_SKIP_TASKBAR", False),
+    XInternAtom(dsp, "_NET_WM_STATE_SKIP_PAGER", False)
   };
-  XChangeProperty(dpy, win, win_state, XA_ATOM, 32,
-                  PropModeReplace, (unsigned char*)&win_state_setting, 3);
-
-  /* give initial pos/size information to window manager
-     about the window, this prevents flickering */
-  /* NOTE: unneeded if override_redirect is set to True
-  sizehints = XAllocSizeHints();
-  sizehints->flags = USPosition | USSize;
-  sizehints->x = -1;
-  sizehints->y = -1;
-  sizehints->width = 1;
-  sizehints->height = 1;
-  XSetWMNormalHints(dpy, win, sizehints);
-  XFree( sizehints );*/
-
-  classhints = XAllocClassHint();
-  classhints->res_name = res_name;
-  classhints->res_class = res_class;
-  XSetClassHint(dpy, win, classhints);
-  XFree( classhints );
+  XChangeProperty(dsp, win, win_state, XA_ATOM, 32,
+    PropModeReplace, (unsigned char*)&win_state_setting, 3);
 }
 
 static Window
-make_window(Display *dpy, Window root_win, Visual *visual, Colormap colormap, Bool use_argbvisual) {
+make_window(Display* dsp, Window root_win, Visual* visual, Colormap colormap, Bool argb)
+{
   Window win;
   XSetWindowAttributes att;
 
@@ -255,250 +414,29 @@ make_window(Display *dpy, Window root_win, Visual *visual, Colormap colormap, Bo
   att.background_pixel = 0x0;
   att.border_pixel = 0;
   att.background_pixmap = None;
+  att.colormap = colormap;
   att.save_under = True;
   att.event_mask = ExposureMask | StructureNotifyMask | ButtonPressMask;
   att.override_redirect = True;
 
-  if ( use_argbvisual )
+  if (argb)
   {
-    att.colormap = colormap;
-    win = XCreateWindow(dpy, root_win,
-                      -1, -1, 1, 1, 0, 32, InputOutput, visual,
-                      CWBackingStore | CWBackPixel | CWBackPixmap | CWBorderPixel |
-                      CWColormap | CWEventMask | CWSaveUnder | CWOverrideRedirect,
-                      &att);
-  } else {
-    win = XCreateWindow(dpy, root_win,
-                      -1, -1, 1, 1, 0, CopyFromParent, InputOutput, CopyFromParent,
-                      CWBackingStore | CWBackPixel | CWBackPixmap | CWBorderPixel |
-                      CWEventMask | CWSaveUnder | CWOverrideRedirect,
-                      &att);
+    win = XCreateWindow(dsp, root_win,
+      -1, -1, 1, 1, 0, 32, InputOutput, visual, CWBackingStore | CWBackPixel |
+      CWBackPixmap | CWBorderPixel | CWColormap | CWEventMask | CWSaveUnder |
+      CWOverrideRedirect, &att);
+  }
+  else
+  {
+    win = XCreateWindow(dsp, root_win,
+      -1, -1, 1, 1, 0, CopyFromParent, InputOutput, CopyFromParent,
+      CWBackingStore | CWBackPixel | CWBackPixmap | CWBorderPixel |
+      CWEventMask | CWSaveUnder | CWOverrideRedirect, &att);
   }
 
-  set_hints(dpy, win);
+  set_hints(dsp, win);
 
   return win;
-}
-
-void
-ghosd_show(Ghosd *ghosd) {
-  if ((!ghosd->composite) && (ghosd->transparent)) {
-    if (ghosd->background.set)
-    {
-      XFreePixmap(ghosd->dpy, ghosd->background.pixmap);
-      ghosd->background.set = 0;
-    }
-    ghosd->background.pixmap = take_snapshot(ghosd);
-    ghosd->background.set = 1;
-  }
-
-  ghosd_render(ghosd);
-  XMapRaised(ghosd->dpy, ghosd->win);
-}
-
-void
-ghosd_hide(Ghosd *ghosd) {
-  XUnmapWindow(ghosd->dpy, ghosd->win);
-}
-
-void
-ghosd_set_transparent(Ghosd *ghosd, int transparent) {
-  ghosd->transparent = (transparent != 0);
-}
-
-void
-ghosd_set_render(Ghosd *ghosd, GhosdRenderFunc render_func,
-                 void *user_data, void (*user_data_d)(void*)) {
-  ghosd->render.func = render_func;
-  ghosd->render.data = user_data;
-  ghosd->render.data_destroy = user_data_d;
-}
-
-void
-ghosd_set_position(Ghosd *ghosd, int x, int y, int width, int height) {
-  const int dpy_width  = DisplayWidth(ghosd->dpy,  DefaultScreen(ghosd->dpy));
-  const int dpy_height = DisplayHeight(ghosd->dpy, DefaultScreen(ghosd->dpy));
-
-  if (x == GHOSD_COORD_CENTER) {
-    x = (dpy_width - width) / 2;
-  } else if (x < 0) {
-    x = dpy_width - width + x;
-  }
-
-  if (y == GHOSD_COORD_CENTER) {
-    y = (dpy_height - height) / 2;
-  } else if (y < 0) {
-    y = dpy_height - height + y;
-  }
-
-  ghosd->x      = x;
-  ghosd->y      = y;
-  ghosd->width  = width;
-  ghosd->height = height;
-
-  XMoveResizeWindow(ghosd->dpy, ghosd->win,
-                    ghosd->x, ghosd->y, ghosd->width, ghosd->height);
-}
-
-void
-ghosd_set_event_button_cb(Ghosd *ghosd, GhosdEventButtonCb func, void *user_data)
-{
-  ghosd->eventbutton.func = func;
-  ghosd->eventbutton.data = user_data;
-}
-
-#if 0
-static int
-x_error_handler(Display *dpy, XErrorEvent* evt) {
-  /* segfault so we can get a backtrace. */
-  char *x = NULL;
-  *x = 0;
-  return 0;
-}
-#endif
-
-Ghosd*
-ghosd_new(void) {
-  Ghosd *ghosd;
-  Display *dpy;
-  Window win, root_win;
-  int screen_num;
-  Visual *visual;
-  Colormap colormap;
-  Bool use_argbvisual = False;
-
-  dpy = XOpenDisplay(NULL);
-  if (dpy == NULL) {
-    fprintf(stderr, "Couldn't open display: (XXX FIXME)\n");
-    return NULL;
-  }
-  
-  screen_num = DefaultScreen(dpy);
-  root_win = RootWindow(dpy, screen_num);
-  visual = NULL; /* unused */
-  colormap = None; /* unused */
-
-  win = make_window(dpy, root_win, visual, colormap, use_argbvisual);
-  
-  ghosd = calloc(1, sizeof(Ghosd));
-  ghosd->dpy = dpy;
-  ghosd->visual = visual;
-  ghosd->colormap = colormap;
-  ghosd->win = win;
-  ghosd->root_win = root_win;
-  ghosd->screen_num = screen_num;
-  ghosd->transparent = 1;
-  ghosd->composite = 0;
-  ghosd->eventbutton.func = NULL;
-  ghosd->background.set = 0;
-
-  return ghosd;
-}
-
-#ifdef HAVE_XCOMPOSITE
-Ghosd *
-ghosd_new_with_argbvisual(void) {
-  Ghosd *ghosd;
-  Display *dpy;
-  Window win, root_win;
-  int screen_num;
-  Visual *visual;
-  Colormap colormap;
-  Bool use_argbvisual = True;
-
-  dpy = XOpenDisplay(NULL);
-  if (dpy == NULL) {
-    fprintf(stderr, "Couldn't open display: (XXX FIXME)\n");
-    return NULL;
-  }
-  
-  screen_num = DefaultScreen(dpy);
-  root_win = RootWindow(dpy, screen_num);
-  visual = composite_find_argb_visual(dpy, screen_num);
-  if (visual == NULL)
-    return NULL;
-  colormap = XCreateColormap(dpy, root_win, visual, AllocNone);
-
-  win = make_window(dpy, root_win, visual, colormap, use_argbvisual);
-  
-  ghosd = calloc(1, sizeof(Ghosd));
-  ghosd->dpy = dpy;
-  ghosd->visual = visual;
-  ghosd->colormap = colormap;
-  ghosd->win = win;
-  ghosd->root_win = root_win;
-  ghosd->screen_num = screen_num;
-  ghosd->transparent = 1;
-  ghosd->composite = 1;
-  ghosd->eventbutton.func = NULL;
-  ghosd->background.set = 0;
-
-  return ghosd;
-}
-
-int
-ghosd_check_composite_ext(void)
-{
-  Display *dpy;
-  int have_composite_x = 0;
-  int composite_event_base = 0, composite_error_base = 0;
-  
-  dpy = XOpenDisplay(NULL);
-  if (dpy == NULL) {
-    fprintf(stderr, "Couldn't open display: (XXX FIXME)\n");
-    return 0;
-  }
-  
-  if (!XCompositeQueryExtension(dpy,
-        &composite_event_base, &composite_error_base))
-    have_composite_x = 0;
-  else
-    have_composite_x = 1;
-
-  XCloseDisplay(dpy);
-  return have_composite_x;
-}
-
-int
-ghosd_check_composite_mgr(void)
-{
-  Display *dpy;
-  int have_composite_m = 0;
-  
-  dpy = XOpenDisplay(NULL);
-  if (dpy == NULL) {
-    fprintf(stderr, "Couldn't open display: (XXX FIXME)\n");
-    return 0;
-  }
-  
-  if (!composite_find_manager(dpy, DefaultScreen(dpy)))
-    have_composite_m = 0;
-  else
-    have_composite_m = 1;
-  
-  XCloseDisplay(dpy);
-  return have_composite_m;
-}
-#endif
-
-void
-ghosd_destroy(Ghosd* ghosd) {
-  if (ghosd->background.set)
-  {
-    XFreePixmap(ghosd->dpy, ghosd->background.pixmap);
-    ghosd->background.set = 0;
-  }
-  if (ghosd->composite)
-  {
-    XFreeColormap(ghosd->dpy, ghosd->colormap);
-  }
-  XDestroyWindow(ghosd->dpy, ghosd->win);
-  XCloseDisplay(ghosd->dpy);
-}
-
-int
-ghosd_get_socket(Ghosd *ghosd) {
-  return ConnectionNumber(ghosd->dpy);
 }
 
 /* vim: set ts=2 sw=2 et cino=(0 : */

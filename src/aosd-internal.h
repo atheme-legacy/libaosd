@@ -1,8 +1,8 @@
-/* ghosd -- OSD with fake transparency, cairo, and pango.
+/* aosd -- OSD with transparency, cairo, and pango.
+ *
  * Copyright (C) 2006 Evan Martin <martine@danga.com>
  *
  * With further development by Giacomo Lozito <james@develia.org>
- * for the ghosd-based Audacious OSD
  * - added real transparency with X Composite Extension
  * - added mouse event handling on OSD window
  * - added/changed some other stuff
@@ -12,27 +12,31 @@
 
 #include "aosd.h"
 
-typedef struct {
-  GhosdRenderFunc func;
-  void *data;
-  void (*data_destroy)(void*);
+typedef struct
+{
+  AosdRenderer render_cb;
+  void* data;
+  void (*data_destroyer)(void*);
 } RenderCallback;
 
-typedef struct {
-  GhosdEventButtonCb func;
-  void *data;
-} EventButtonCallback;
+typedef struct
+{
+  AosdMouseEventCb mouse_event_cb;
+  void* data;
+} MouseEventCallback;
 
-typedef struct {
+typedef struct
+{
   Pixmap pixmap;
   int set;
-} GhosdBackground;
+} AosdBackground;
 
-struct _Ghosd {
-  Display *dpy;
+struct _Aosd
+{
+  Display* display;
   Window win;
   Window root_win;
-  Visual *visual;
+  Visual* visual;
   Colormap colormap;
   int screen_num;
   unsigned int depth;
@@ -40,9 +44,9 @@ struct _Ghosd {
   int composite;
   int x, y, width, height;
 
-  GhosdBackground background;
-  RenderCallback render;
-  EventButtonCallback eventbutton;
+  AosdBackground background;
+  RenderCallback renderer;
+  MouseEventCallback mouse_processor;
 };
 
 /* vim: set ts=2 sw=2 et cino=(0 : */
