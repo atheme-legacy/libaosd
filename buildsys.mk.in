@@ -201,29 +201,32 @@ install: ${LIB} ${STATIC_LIB} ${PLUGIN} ${PROG} install-extra
 		${DIR_LEAVE}; \
 	done
 
-	i=${LIB}; \
-	${INSTALL_STATUS}; \
-	if ${MKDIR_P} ${DESTDIR}${libdir} && ${INSTALL_LIB}; then \
-		${INSTALL_OK}; \
-	else \
-		${INSTALL_FAILED}; \
-	fi
+	for i in ${LIB}; do \
+		${INSTALL_STATUS}; \
+		if ${MKDIR_P} ${DESTDIR}${libdir} && ${INSTALL_LIB}; then \
+			${INSTALL_OK}; \
+		else \
+			${INSTALL_FAILED}; \
+		fi \
+	done
 
-	i=${STATIC_LIB}; \
-	${INSTALL_STATUS}; \
-	if ${MKDIR_P} ${DESTDIR}${libdir} && ${INSTALL} -m 644 $$i ${DESTDIR}${libdir}/$$i; then \
-		${INSTALL_OK}; \
-	else \
-		${INSTALL_FAILED}; \
-	fi
+	for i in ${STATIC_LIB}; do \
+		${INSTALL_STATUS}; \
+		if ${MKDIR_P} ${DESTDIR}${libdir} && ${INSTALL} -m 644 $$i ${DESTDIR}${libdir}/$$i; then \
+			${INSTALL_OK}; \
+		else \
+			${INSTALL_FAILED}; \
+		fi \
+	done
 
-	i=${PLUGIN}; \
-	${INSTALL_STATUS}; \
-	if ${MKDIR_P} ${DESTDIR}${plugindir} && ${INSTALL} -m 755 $$i ${DESTDIR}${plugindir}/$$i; then \
-		${INSTALL_OK}; \
-	else \
-		${INSTALL_FAILED}; \
-	fi
+	for i in ${PLUGIN}; do \
+		${INSTALL_STATUS}; \
+		if ${MKDIR_P} ${DESTDIR}${plugindir} && ${INSTALL} -m 755 $$i ${DESTDIR}${plugindir}/$$i; then \
+			${INSTALL_OK}; \
+		else \
+			${INSTALL_FAILED}; \
+		fi \
+	done
 
 	for i in ${DATA}; do \
 		${INSTALL_STATUS}; \
@@ -234,13 +237,14 @@ install: ${LIB} ${STATIC_LIB} ${PLUGIN} ${PROG} install-extra
 		fi \
 	done
 
-	i=${PROG}; \
-	${INSTALL_STATUS}; \
-	if ${MKDIR_P} ${DESTDIR}${bindir} && ${INSTALL} -m 755 $$i ${DESTDIR}${bindir}/$$i; then \
-		${INSTALL_OK}; \
-	else \
-		${INSTALL_FAILED}; \
-	fi
+	for i in ${PROG}; do \
+		${INSTALL_STATUS}; \
+		if ${MKDIR_P} ${DESTDIR}${bindir} && ${INSTALL} -m 755 $$i ${DESTDIR}${bindir}/$$i; then \
+			${INSTALL_OK}; \
+		else \
+			${INSTALL_FAILED}; \
+		fi \
+	done
 
 	for i in ${INCLUDES}; do \
 		${INSTALL_STATUS}; \
@@ -269,32 +273,35 @@ uninstall: uninstall-extra
 		${DIR_LEAVE}; \
 	done
 
-	i=${LIB}; \
-	if test -f ${DESTDIR}${libdir}/$$i; then \
-		if ${UNINSTALL_LIB}; then \
-			${DELETE_OK}; \
-		else \
-			${DELETE_FAILED}; \
-		fi \
-	fi
+	for i in ${LIB}; do \
+		if test -f ${DESTDIR}${libdir}/$$i; then \
+			if ${UNINSTALL_LIB}; then \
+				${DELETE_OK}; \
+			else \
+				${DELETE_FAILED}; \
+			fi \
+		fi; \
+	done
 
-	i=${STATIC_LIB}; \
-	if test -f ${DESTDIR}${libdir}/$$i; then \
-		if rm -f ${DESTDIR}${libdir}/$$i; then \
-			${DELETE_OK}; \
-		else \
-			${DELETE_FAILED}; \
+	for i in ${STATIC_LIB}; do \
+		if test -f ${DESTDIR}${libdir}/$$i; then \
+			if rm -f ${DESTDIR}${libdir}/$$i; then \
+				${DELETE_OK}; \
+			else \
+				${DELETE_FAILED}; \
+			fi \
 		fi \
-	fi
+	done
 
-	i=${PLUGIN}; \
-	if test -f ${DESTDIR}${plugindir}/$$i; then \
-		if rm -f ${DESTDIR}${plugindir}/$$i; then \
-			${DELETE_OK}; \
-		else \
-			${DELETE_FAILED}; \
+	for i in ${PLUGIN}; do \
+		if test -f ${DESTDIR}${plugindir}/$$i; then \
+			if rm -f ${DESTDIR}${plugindir}/$$i; then \
+				${DELETE_OK}; \
+			else \
+				${DELETE_FAILED}; \
+			fi \
 		fi \
-	fi
+	done
 	-rmdir ${DESTDIR}${plugindir} >/dev/null 2>&1
 
 	for i in ${DATA}; do \
@@ -307,14 +314,15 @@ uninstall: uninstall-extra
 		fi \
 	done
 
-	i=${PROG}; \
-	if test -f ${DESTDIR}${bindir}/$$i; then \
-		if rm -f ${DESTDIR}${bindir}/$$i; then \
-			${DELETE_OK}; \
-		else \
-			${DELETE_FAILED}; \
+	for i in ${PROG}; do \
+		if test -f ${DESTDIR}${bindir}/$$i; then \
+			if rm -f ${DESTDIR}${bindir}/$$i; then \
+				${DELETE_OK}; \
+			else \
+				${DELETE_FAILED}; \
+			fi \
 		fi \
-	fi
+	done
 
 	for i in ${INCLUDES}; do \
 		if test -f ${DESTDIR}${includedir}/${includesubdir}/$$i; then \
