@@ -15,3 +15,4 @@ INCLUDES += ${AUX_PANGO}.h
 include ../buildsys.mk
 
 CPPFLAGS += ${LIB_CPPFLAGS} ${AUX_CFLAGS} -I..
+LIBS += ${AUX_LDFLAGS}
