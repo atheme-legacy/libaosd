@@ -5,9 +5,12 @@ LIB_MINOR = 0
 SRCS = aosd.c \
        aosd-main.c
 
+INCLUDES = aosd.h
+
 include ../extra.mk
 
-SRCS += ${AUX_PANGO_SRCS}
+SRCS += ${AUX_PANGO}.c
+INCLUDES += ${AUX_PANGO}.h
 
 include ../buildsys.mk
 

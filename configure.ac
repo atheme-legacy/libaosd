@@ -51,7 +51,7 @@ if test "$enable_pango" = "yes"; then
 	     AUX_CFLAGS+=" $PANGO_CFLAGS $PANGOCAIRO_CFLAGS"
 	     AUX_LDFLAGS+=" $PANGO_LIBS $PANGOCAIRO_LIBS"
 	     AC_DEFINE([HAVE_PANGO], [1], [Both pango and pangocairo are available])
-	     AUX_PANGO_SRCS=aosd-text.c
+	     AUX_PANGO=aosd-text
 	    ],
 	    [
 	     AC_MSG_WARN(can't find pangocairo package)
@@ -92,7 +92,7 @@ fi
 AC_SUBST(PACKAGES)
 AC_SUBST(AUX_CFLAGS)
 AC_SUBST(AUX_LDFLAGS)
-AC_SUBST(AUX_PANGO_SRCS)
+AC_SUBST(AUX_PANGO)
 
 AC_CONFIG_FILES(
     [
