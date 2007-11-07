@@ -13,6 +13,8 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_ISC_POSIX
 
+AC_PATH_PROG(AR, ar)
+
 if test "x$GCC" = "xyes"; then
     CFLAGS+=" -Wall -Wpointer-arith -Wstrict-prototypes -Wmissing-prototypes"
     CFLAGS+=" -Wmissing-declarations -Wnested-externs -fno-strict-aliasing"
