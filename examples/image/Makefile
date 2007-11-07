@@ -1,9 +1,10 @@
+PROG_NOINST = image
+
 SRCS = image.c
 
 include ../../buildsys.mk
 include ../../extra.mk
 
-PROG_NOINST = image
-
-CPPFLAGS += ${LIB_CPPFLAGS} ${AUX_CFLAGS} -I../../src -I../shared
-LDFLAGS += ${LIB_LDFLAGS} ${AUX_LDFLAGS} ../shared/example-shared.a -L../../src -laosd
+CPPFLAGS += ${LIB_CPPFLAGS} ${AUX_CFLAGS} -I../../libaosd -I../shared
+CFLAGS += ${LIB_CFLAGS}
+LDFLAGS += ${LIB_LDFLAGS} ${AUX_LDFLAGS} ../shared/example-shared.a -L../../libaosd -laosd

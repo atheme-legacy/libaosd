@@ -1,3 +1,5 @@
+PROG = aosd_cat
+
 SUBDIRS = shared \
 	  animation \
 	  image \
@@ -8,7 +10,5 @@ SRCS = aosd_cat.c
 include ../buildsys.mk
 include ../extra.mk
 
-PROG = aosd_cat
-
-CPPFLAGS += ${LIB_CPPFLAGS} ${AUX_CFLAGS} -I../src
-LDFLAGS += -L../src -laosd ${AUX_LDFLAGS} shared/example-shared.a
+CPPFLAGS += ${LIB_CPPFLAGS} ${AUX_CFLAGS} -I..
+LDFLAGS += -L../libaosd -laosd ${AUX_LDFLAGS} shared/example-shared.a
