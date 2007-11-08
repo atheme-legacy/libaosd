@@ -27,47 +27,13 @@ AC_SUBST(PACKAGE)
 # Checks for libraries.
 BUILDSYS_SHARED_LIB
 
-PKG_CHECK_MODULES(CAIRO, cairo,
-    [
-     PACKAGES=cairo
-     AUX_CFLAGS=$CAIRO_CFLAGS
-     AUX_LDFLAGS=$CAIRO_LIBS
-    ],
-    [
-     AC_MSG_ERROR(can't find cairo package)
-    ]
-)
+PKG_CHECK_MODULES(CAIRO, cairo)
+PKG_CHECK_MODULES(PANGO, pango)
+PKG_CHECK_MODULES(PANGOCAIRO, pangocairo)
 
-AC_ARG_ENABLE(pango,
-    [AC_HELP_STRING([--disable-pango], [avoid using pango (default=autodetect)])],
-    [enable_pango=$enableval], [enable_pango="yes"]
-)
-
-if test "$enable_pango" = "yes"; then
-    PKG_CHECK_MODULES(PANGO, pango,
-	[
-	 PKG_CHECK_MODULES(PANGOCAIRO, pangocairo,
-	    [
-	     PACKAGES+=" pango pangocairo"
-	     AUX_CFLAGS+=" $PANGO_CFLAGS $PANGOCAIRO_CFLAGS"
-	     AUX_LDFLAGS+=" $PANGO_LIBS $PANGOCAIRO_LIBS"
-	     AC_DEFINE([HAVE_PANGO], [1], [Both pango and pangocairo are available])
-	     AUX_PANGO=aosd-text
-	    ],
-	    [
-	     AC_MSG_WARN(can't find pangocairo package)
-	     enable_pango="no"
-	    ]
-	 )
-	],
-	[
-	 AC_MSG_WARN(can't find pango package)
-	 enable_pango="no"
-	]
-    )
-else
-    enable_pango="no"
-fi
+PACKAGES="cairo pango pangocairo"
+AUX_CFLAGS="$CAIRO_CFLAGS $PANGO_CFLAGS $PANGOCAIRO_CFLAGS"
+AUX_LDFLAGS="$CAIRO_LIBS $PANGO_LIBS $PANGOCAIRO_LIBS"
 
 AC_ARG_ENABLE(xcomposite,
     [AC_HELP_STRING([--disable-xcomposite], [avoid using X composite (default=autodetect)])],
@@ -93,7 +59,6 @@ fi
 AC_SUBST(PACKAGES)
 AC_SUBST(AUX_CFLAGS)
 AC_SUBST(AUX_LDFLAGS)
-AC_SUBST(AUX_PANGO)
 
 AC_CONFIG_FILES(
     [

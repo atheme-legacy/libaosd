@@ -9,7 +9,7 @@
 
 #include <cairo/cairo.h>
 
-#include <aosd.h>
+#include <libaosd/aosd.h>
 
 typedef struct {
   cairo_surface_t* foot;

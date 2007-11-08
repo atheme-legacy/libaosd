@@ -11,8 +11,8 @@
 
 #include <X11/Xlib.h>
 
-#include <aosd.h>
-#include <aosd-text.h>
+#include <libaosd/aosd.h>
+#include <libaosd/aosd-text.h>
 
 int main(int argc, char* argv[]) {
   Aosd* aosd;
