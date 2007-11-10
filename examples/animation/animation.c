@@ -62,10 +62,10 @@ int main(int argc, char* argv[]) {
   data.alpha = 0.5;
 
   aosd = aosd_new();
-  aosd_set_transparency(aosd, TRANSPARENCY_FAKE);
+  aosd_set_transparency(aosd, TRANSPARENCY_COMPOSITE);
   aosd_set_geometry(aosd, 50, 50, 200, 240);
   aosd_set_renderer(aosd, render, &data, NULL);
-  aosd_render(aosd);
+
   aosd_show(aosd);
 
   aosd_main_iterations(aosd);
