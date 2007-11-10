@@ -43,12 +43,6 @@ typedef void (*AosdRenderer)(Aosd* aosd, cairo_t* cr, void* user_data);
 typedef void (*AosdMouseEventCb)(Aosd* aosd, AosdMouseEvent* event,
                                  void* user_data);
 
-#ifdef HAVE_XCOMPOSITE
-/* composite checkers */
-int aosd_check_composite_ext(void);
-int aosd_check_composite_mgr(void);
-#endif
-
 /* object allocators */
 Aosd* aosd_new(void);
 #ifdef HAVE_XCOMPOSITE

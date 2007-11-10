@@ -8,6 +8,8 @@
  * - added/changed some other stuff
  */
 
+#include "config.h"
+
 #include <X11/Xlib.h>
 
 #include "aosd.h"
@@ -48,5 +50,11 @@ struct _Aosd
   RenderCallback renderer;
   MouseEventCallback mouse_processor;
 };
+
+#ifdef HAVE_XCOMPOSITE
+/* composite checkers */
+int aosd_check_composite_ext(void);
+int aosd_check_composite_mgr(void);
+#endif
 
 /* vim: set ts=2 sw=2 et cino=(0 : */
