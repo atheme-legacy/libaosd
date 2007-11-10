@@ -378,7 +378,10 @@ do_render(PangoLayout *layout, int unref_layout) {
         const int height = ink_rect.y + ink_rect.height + abs(SHADOW_OFFSET) + RECT_PADDING;
 
         if (!aosd)
+        {
             aosd = aosd_new();
+            aosd_set_transparency(aosd, TRANSPARENCY_COMPOSITE);
+        }
         aosd_set_geometry(aosd, XPOS, YPOS, width, height);
     }
     aosd_set_renderer(aosd, render, layout, g_object_unref);
