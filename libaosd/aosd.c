@@ -20,8 +20,6 @@
 
 #include "aosd-internal.h"
 
-#include "aosd.h"
-
 Aosd*
 aosd_new(void)
 {
