@@ -93,6 +93,7 @@ make_window(Aosd* aosd)
   }
 
   set_window_properties(dsp, aosd->win);
+  aosd_set_geometry(aosd, aosd->x, aosd->y, aosd->width, aosd->height);
 }
 
 Pixmap
