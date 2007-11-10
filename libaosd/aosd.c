@@ -23,61 +23,122 @@
 Aosd*
 aosd_new(void)
 {
-  Display* dsp = aosd_get_display();
+  Aosd* aosd = NULL;
+  Display* dsp = XOpenDisplay(NULL);
 
   if (dsp == NULL)
-    return NULL;
+    fprintf(stderr, "libaosd: Couldn't open the display.\n");
+  else
+  {
+    int screen_num = DefaultScreen(dsp);
+    Window root_win = DefaultRootWindow(dsp);
 
-  return aosd_internal_new(dsp, False);
+    aosd = calloc(1, sizeof(Aosd));
+    aosd->display = dsp;
+    aosd->screen_num = screen_num;
+    aosd->root_win = root_win;
+    aosd->mode = TRANSPARENCY_NONE;
+
+    make_window(aosd);
+    aosd_set_name(aosd, NULL);
+  }
+
+  return aosd;
 }
-
-#ifdef HAVE_XCOMPOSITE
-Aosd*
-aosd_new_argb(void)
-{
-  Display* dsp = aosd_get_display();
-
-  if (dsp == NULL)
-    return NULL;
-
-  return aosd_internal_new(dsp, True);
-}
-#endif
 
 void
 aosd_destroy(Aosd* aosd)
 {
-  if (aosd->background.set)
-  {
-    XFreePixmap(aosd->display, aosd->background.pixmap);
-    aosd->background.set = 0;
-  }
+  if (aosd == NULL)
+    return;
 
-  if (aosd->composite)
-    XFreeColormap(aosd->display, aosd->colormap);
+  aosd->root_win = None;
+  make_window(aosd);
 
-  XDestroyWindow(aosd->display, aosd->win);
   XCloseDisplay(aosd->display);
   free(aosd);
 }
 
-int
-aosd_get_socket(Aosd* aosd)
+void
+aosd_get_name(Aosd* aosd, XClassHint* result)
 {
-  return ConnectionNumber(aosd->display);
+  if (aosd == NULL || result == NULL)
+    return;
+
+  XGetClassHint(aosd->display, aosd->win, result);
+}
+
+AosdTransparency
+aosd_get_transparency(Aosd* aosd)
+{
+  if (aosd == NULL)
+    return TRANSPARENCY_NONE;
+
+  return aosd->mode;
 }
 
 void
-aosd_set_transparent(Aosd* aosd, int transparent)
+aosd_get_geometry(Aosd* aosd, int* x, int* y, int* width, int* height)
 {
-  aosd->transparent = (transparent != 0);
+  if (x != NULL)
+    *x = (aosd == NULL) ? 0 : aosd->x;
+  if (y != NULL)
+    *y = (aosd == NULL) ? 0 : aosd->x;
+  if (width != NULL)
+    *width  = (aosd == NULL) ? 0 : aosd->width;
+  if (height != NULL)
+    *height = (aosd == NULL) ? 0 : aosd->height;
 }
 
 void
-aosd_set_position(Aosd* aosd, int x, int y, int width, int height)
+aosd_set_name(Aosd* aosd, XClassHint* name)
 {
+  Bool flag = False;
+
+  if (aosd == NULL)
+    return;
+
+  if (name == NULL)
+  {
+    name = XAllocClassHint();
+    name->res_class = "Atheme";
+    name->res_name = "libaosd";
+    flag = True;
+  }
+
+  XSetClassHint(aosd->display, aosd->win, name);
+
+  if (flag)
+    XFree(name);
+}
+
+void
+aosd_set_transparency(Aosd* aosd, AosdTransparency mode)
+{
+  XClassHint* name;
+
+  if (aosd == NULL || aosd->mode == mode)
+    return;
+
+  // we have to preserve window name
+  name = XAllocClassHint();
+  aosd_get_name(aosd, name);
+
+  aosd->mode = mode;
+  make_window(aosd);
+
+  aosd_set_name(aosd, name);
+  XFree(name);
+}
+
+void
+aosd_set_geometry(Aosd* aosd, int x, int y, int width, int height)
+{
+  if (aosd == NULL)
+    return;
+
   Display* dsp = aosd->display;
-  int scr = DefaultScreen(dsp);
+  int scr = aosd->screen_num;
   const int dsp_width  = DisplayWidth(dsp, scr);
   const int dsp_height = DisplayHeight(dsp, scr);
 
@@ -103,6 +164,9 @@ void
 aosd_set_renderer(Aosd* aosd, AosdRenderer renderer,
                   void* user_data, void (*user_data_d)(void*))
 {
+  if (aosd == NULL)
+    return;
+
   aosd->renderer.render_cb = renderer;
   aosd->renderer.data = user_data;
   aosd->renderer.data_destroyer = user_data_d;
@@ -111,6 +175,9 @@ aosd_set_renderer(Aosd* aosd, AosdRenderer renderer,
 void
 aosd_set_mouse_event_cb(Aosd* aosd, AosdMouseEventCb cb, void* user_data)
 {
+  if (aosd == NULL)
+    return;
+
   aosd->mouse_processor.mouse_event_cb = cb;
   aosd->mouse_processor.data = user_data;
 }
@@ -118,13 +185,17 @@ aosd_set_mouse_event_cb(Aosd* aosd, AosdMouseEventCb cb, void* user_data)
 void
 aosd_render(Aosd* aosd)
 {
+  if (aosd == NULL)
+    return;
+
   Display* dsp = aosd->display;
+  int scr = aosd->screen_num;
   int width = aosd->width, height = aosd->height;
   Window win = aosd->win;
   Pixmap pixmap;
   GC gc;
 
-  if (aosd->composite)
+  if (aosd->mode == TRANSPARENCY_COMPOSITE)
   {
     pixmap = XCreatePixmap(dsp, win, width, height, 32);
     gc = XCreateGC(dsp, pixmap, 0, NULL);
@@ -132,10 +203,9 @@ aosd_render(Aosd* aosd)
   }
   else
   {
-    pixmap = XCreatePixmap(dsp, win, width, height,
-                           DefaultDepth(dsp, DefaultScreen(dsp)));
+    pixmap = XCreatePixmap(dsp, win, width, height, DefaultDepth(dsp, scr));
     gc = XCreateGC(dsp, pixmap, 0, NULL);
-    if (aosd->transparent)
+    if (aosd->mode == TRANSPARENCY_FAKE)
       /* make our own copy of the background pixmap as the initial surface */
       XCopyArea(dsp, aosd->background.pixmap, pixmap, gc,
                 0, 0, width, height, 0, 0);
@@ -150,21 +220,13 @@ aosd_render(Aosd* aosd)
     /* create cairo surface using the pixmap */
     XRenderPictFormat* xrformat;
     cairo_surface_t* surf;
-    if (aosd->composite)
-    {
+    if (aosd->mode == TRANSPARENCY_COMPOSITE)
       xrformat = XRenderFindVisualFormat(dsp, aosd->visual);
-      surf = cairo_xlib_surface_create_with_xrender_format(
-             dsp, pixmap, ScreenOfDisplay(dsp, aosd->screen_num),
-             xrformat, width, height);
-    }
     else
-    {
-      xrformat = XRenderFindVisualFormat(dsp,
-             DefaultVisual(dsp, DefaultScreen(dsp)));
-      surf = cairo_xlib_surface_create_with_xrender_format(
-             dsp, pixmap, ScreenOfDisplay(dsp, DefaultScreen(dsp)),
-             xrformat, width, height);
-    }
+      xrformat = XRenderFindVisualFormat(dsp, DefaultVisual(dsp, scr));
+
+    surf = cairo_xlib_surface_create_with_xrender_format(
+        dsp, pixmap, ScreenOfDisplay(dsp, scr), xrformat, width, height);
 
     /* draw some stuff */
     cairo_t* cr = cairo_create(surf);
@@ -188,8 +250,10 @@ aosd_render(Aosd* aosd)
 void
 aosd_show(Aosd* aosd)
 {
-  if (!aosd->composite &&
-      aosd->transparent)
+  if (aosd == NULL)
+    return;
+
+  if (aosd->mode == TRANSPARENCY_FAKE)
   {
     if (aosd->background.set)
     {
@@ -207,6 +271,9 @@ aosd_show(Aosd* aosd)
 void
 aosd_hide(Aosd* aosd)
 {
+  if (aosd == NULL)
+    return;
+
   XUnmapWindow(aosd->display, aosd->win);
 }
 

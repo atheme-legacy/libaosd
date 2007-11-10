@@ -50,7 +50,7 @@ aosd_text_new(const char* markup, int x, int y)
   const int height = ink_rect.y + ink_rect.height + 5;
 
   aosd = aosd_new();
-  aosd_set_position(aosd, x, y, width, height);
+  aosd_set_geometry(aosd, x, y, width, height);
   aosd_set_renderer(aosd, render_text, layout, g_object_unref);
   
   return aosd;

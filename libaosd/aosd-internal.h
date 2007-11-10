@@ -34,31 +34,27 @@ typedef struct
 struct _Aosd
 {
   Display* display;
-  Window win;
-  Window root_win;
-  Visual* visual;
-  Colormap colormap;
   int screen_num;
   unsigned int depth;
-  int transparent;
-  int composite;
+  Window root_win;
+  Window win;
+  Visual* visual;
+  Colormap colormap;
   int x, y, width, height;
 
   AosdBackground background;
   RenderCallback renderer;
+  AosdTransparency mode;
   MouseEventCallback mouse_processor;
 };
 
+void make_window(Aosd*);
+void set_window_properties(Display*, Window);
+Pixmap take_snapshot(Aosd*);
+
 #ifdef HAVE_XCOMPOSITE
-int aosd_check_composite_ext(void);
-int aosd_check_composite_mgr(void);
+Bool composite_check_ext_and_mgr(Display*, int);
 Visual* composite_find_argb_visual(Display*, int);
 #endif
-
-Display* aosd_get_display(void);
-Window make_window(Display*, Window, Visual*, Colormap, Bool);
-void set_hints(Display*, Window);
-Pixmap take_snapshot(Aosd*);
-Aosd* aosd_internal_new(Display*, Bool);
 
 /* vim: set ts=2 sw=2 et cino=(0 : */

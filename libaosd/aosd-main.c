@@ -106,7 +106,7 @@ aosd_main_until(Aosd* aosd, struct timeval* until)
     if (dt <= 0)
       break;
 
-    struct pollfd pollfd = { aosd_get_socket(aosd), POLLIN, 0 };
+    struct pollfd pollfd = { ConnectionNumber(aosd->display), POLLIN, 0 };
     int ret = poll(&pollfd, 1, dt);
 
     if (ret == 0)

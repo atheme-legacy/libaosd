@@ -11,6 +11,8 @@
 #ifndef __AOSD_H__
 #define __AOSD_H__
 
+#include <X11/Xutil.h>
+
 #include <cairo/cairo.h>
 
 #include <limits.h>  /* INT_MAX */
@@ -43,20 +45,26 @@ typedef void (*AosdRenderer)(Aosd* aosd, cairo_t* cr, void* user_data);
 typedef void (*AosdMouseEventCb)(Aosd* aosd, AosdMouseEvent* event,
                                  void* user_data);
 
-/* object allocators */
-Aosd* aosd_new(void);
-#ifdef HAVE_XCOMPOSITE
-Aosd* aosd_new_argb(void);
-#endif
+typedef enum
+{
+  TRANSPARENCY_NONE = 0,
+  TRANSPARENCY_FAKE,
+  TRANSPARENCY_COMPOSITE
+} AosdTransparency;
 
-/* object deallocator */
+/* object (de)allocators */
+Aosd* aosd_new(void);
 void aosd_destroy(Aosd* aosd);
 
-int aosd_get_socket(Aosd* aosd);
+/* object inspectors */
+void aosd_get_name(Aosd* aosd, XClassHint* result);
+AosdTransparency aosd_get_transparency(Aosd* aosd);
+void aosd_get_geometry(Aosd* aosd, int* x, int* y, int* width, int* height);
 
 /* object configurators */
-void aosd_set_transparent(Aosd* aosd, int transparent);
-void aosd_set_position(Aosd* aosd, int x, int y, int width, int height);
+void aosd_set_name(Aosd* aosd, XClassHint* name);
+void aosd_set_transparency(Aosd* aosd, AosdTransparency mode);
+void aosd_set_geometry(Aosd* aosd, int x, int y, int width, int height);
 void aosd_set_renderer(Aosd* aosd, AosdRenderer renderer, void* user_data,
                        void (*user_data_d)(void*));
 void aosd_set_mouse_event_cb(Aosd* aosd, AosdMouseEventCb cb, void* user_data);
