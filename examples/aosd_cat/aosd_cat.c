@@ -379,7 +379,7 @@ do_render(PangoLayout *layout, int unref_layout) {
 
         if (!aosd)
             aosd = aosd_new();
-        aosd_set_position(aosd, XPOS, YPOS, width, height);
+        aosd_set_geometry(aosd, XPOS, YPOS, width, height);
     }
     aosd_set_renderer(aosd, render, layout, g_object_unref);
     aosd_flash(aosd, FADE_MS, TIME_MS);
@@ -390,7 +390,7 @@ do_render(PangoLayout *layout, int unref_layout) {
      * Drawing a 1x1 pixel for 0ms is a hack. And you still have that one-pixel dot!
      * Unforunately, it needs to be on-screen otherwise we get an X-Window error.
      */
-    aosd_set_position(aosd, 0, 0, 1, 1);
+    aosd_set_geometry(aosd, 0, 0, 1, 1);
     aosd_flash(aosd, 0, 0);
     aosd_hide(aosd); /* doesn't seem to do anything to fix */
     /* ghosd_destroy(ghosd); */ /* ditto -- does nothing to remove the pixel */

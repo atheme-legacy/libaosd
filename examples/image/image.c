@@ -144,9 +144,10 @@ main(int argc, char* argv[])
   const int height = cairo_image_surface_get_height(image);
 
   aosd = aosd_new();
-  aosd_set_transparent(aosd, opts.transparent);
+  aosd_set_transparency(aosd,
+      opts.transparent ? TRANSPARENCY_COMPOSITE : TRANSPARENCY_NONE);
 
-  aosd_set_position(aosd,
+  aosd_set_geometry(aosd,
                     opts.x, opts.y,
                     width + (2 * MARGIN), height + (2 * MARGIN));
 
