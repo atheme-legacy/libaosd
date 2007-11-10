@@ -68,7 +68,9 @@ make_window(Aosd* aosd)
     if (composite_check_ext_and_mgr(dsp, aosd->screen_num) &&
         (visual = composite_find_argb_visual(dsp, aosd->screen_num)) != NULL)
     {
-      att.colormap = XCreateColormap(dsp, root_win, visual, AllocNone);
+      aosd->visual = visual;
+      aosd->colormap = att.colormap =
+        XCreateColormap(dsp, root_win, visual, AllocNone);
       aosd->win = XCreateWindow(dsp, root_win,
         -1, -1, 1, 1, 0, 32, InputOutput, visual, CWBackingStore | CWBackPixel |
         CWBackPixmap | CWBorderPixel | CWColormap | CWEventMask | CWSaveUnder |
