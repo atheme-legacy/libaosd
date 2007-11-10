@@ -12,14 +12,21 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/time.h>
-#include <sys/poll.h>
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
 #include <errno.h>
 
+#include <sys/time.h>
+#include <sys/poll.h>
+
+#include <X11/Xlib.h>
+
+#include <pango/pango-layout.h>
+
 #include "aosd-internal.h"
+
+#include "aosd.h"
 
 static void
 aosd_main_iteration(Aosd* aosd)

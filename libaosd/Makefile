@@ -3,6 +3,7 @@ LIB_MAJOR = 1
 LIB_MINOR = 0
 
 SRCS = aosd.c \
+       aosd-internal.c \
        aosd-main.c \
        aosd-text.c
 
