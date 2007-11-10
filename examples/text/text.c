@@ -22,6 +22,7 @@ int main(int argc, char* argv[]) {
                         "اريد"
                         "</span>", -50, -50);
 
+  aosd_set_transparency(aosd, TRANSPARENCY_COMPOSITE);
   aosd_flash(aosd, 1000, 2500);
 
   aosd_destroy(aosd);
