@@ -30,25 +30,25 @@ round_rect(cairo_t *cr, int x, int y, int w, int h, int r) {
   cairo_close_path(cr);
 }
 
-#define RADIUS 20
+#define RADIUS 40
 
 static void
 render(Aosd *aosd, cairo_t *cr, void* data) {
   RenderData *rdata = data;
 
-  cairo_set_source_rgba(cr, rdata->alpha, 0, 0, 0.5);
+  cairo_set_source_rgba(cr, rdata->alpha, 0, 0, 0.7);
   cairo_new_path(cr);
-  round_rect(cr, 10, 10, 180, 230, RADIUS);
+  round_rect(cr, 0, 0, 180, 230, RADIUS);
   cairo_fill(cr);
 
   cairo_set_source_rgba(cr, 1, 1, 1, 1.0);
   cairo_new_path(cr);
-  round_rect(cr, 20, 20, 160, 210, RADIUS);
+  round_rect(cr, 10, 10, 160, 210, RADIUS);
   cairo_stroke(cr);
 
   cairo_save(cr);
   cairo_set_source_rgba(cr, 1, 1, 1, 1.0);
-  cairo_set_source_surface(cr, rdata->foot, 30, 30);
+  cairo_set_source_surface(cr, rdata->foot, 20, 20);
   cairo_paint(cr);
   cairo_restore(cr);
 }
@@ -63,21 +63,21 @@ int main(int argc, char* argv[]) {
 
   aosd = aosd_new();
   aosd_set_transparency(aosd, TRANSPARENCY_COMPOSITE);
-  aosd_set_geometry(aosd, 50, 50, 200, 240);
+  aosd_set_geometry(aosd, 50, 50, 180, 230);
   aosd_set_renderer(aosd, render, &data, NULL);
 
   aosd_show(aosd);
 
   aosd_main_iterations(aosd);
 
-  const int STEP = 50;
+  const int STEP = 1000;
   float dalpha = 0.05;
 
   struct timeval tv_nextupdate;
 
   for (;;) {
     gettimeofday(&tv_nextupdate, NULL);
-    tv_nextupdate.tv_usec += STEP*1000;
+    tv_nextupdate.tv_usec += STEP*100;
 
     aosd_main_until(aosd, &tv_nextupdate);
 
