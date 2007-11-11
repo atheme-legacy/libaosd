@@ -49,7 +49,7 @@ render(Aosd* aosd, cairo_t* cr, void* data)
 
   cairo_set_source_rgba(cr, 0, 0, 0, 0);
   cairo_new_path(cr);
-  round_rect(cr, 0, 0, width+(2*MARGIN), height+(2*MARGIN), RADIUS);
+  round_rect(cr, 0, 0, width + (2 * MARGIN), height + (2 * MARGIN), RADIUS);
   cairo_close_path(cr);
   cairo_fill(cr);
 
@@ -148,8 +148,7 @@ main(int argc, char* argv[])
       opts.transparent ? TRANSPARENCY_COMPOSITE : TRANSPARENCY_NONE);
 
   aosd_set_geometry(aosd,
-                    opts.x, opts.y,
-                    width + (2 * MARGIN), height + (2 * MARGIN));
+      opts.x, opts.y, width + (2 * MARGIN), height + (2 * MARGIN));
 
   aosd_set_renderer(aosd, render, image, NULL);
 
@@ -161,4 +160,4 @@ main(int argc, char* argv[])
   return 0;
 }
 
-/* vim: set ts=2 sw=2 et cino=(0 : */
+/* vim: set ts=2 sw=2 et : */

@@ -1,4 +1,4 @@
-/* aosd -- OSD with fake transparency, cairo, and pango.
+/* aosd -- OSD with transparency, cairo, and pango.
  *
  * Copyright (C) 2006 Evan Martin <martine@danga.com>
  */
@@ -23,7 +23,8 @@ main(int argc, char* argv[])
   aosd = aosd_new_text(
       "<span font_desc='Times New Roman 30'>"
       "some sample text using <b>libaosd</b>\n"
-      "some unicode: Ελληνικά · 한국어 · עברית · ქართული · كورد"
+      "some unicode: Ελληνικά · 한국어 · עברית ·"
+      " ქართული · كورد"
       "</span>",
       50, -50);
 
@@ -37,4 +38,3 @@ main(int argc, char* argv[])
 }
 
 /* vim: set ts=2 sw=2 et : */
-

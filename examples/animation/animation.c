@@ -18,7 +18,8 @@ typedef struct {
 } RenderData;
 
 static void
-round_rect(cairo_t *cr, int x, int y, int w, int h, int r) {
+round_rect(cairo_t* cr, int x, int y, int w, int h, int r)
+{
   cairo_move_to(cr, x+r, y);
   cairo_line_to(cr, x+w-r, y); /* top edge */
   cairo_curve_to(cr, x+w, y, x+w, y, x+w, y+r);
@@ -34,8 +35,9 @@ round_rect(cairo_t *cr, int x, int y, int w, int h, int r) {
 #define RADIUS 40
 
 static void
-render(Aosd *aosd, cairo_t *cr, void* data) {
-  RenderData *rdata = data;
+render(Aosd* aosd, cairo_t* cr, void* data)
+{
+  RenderData* rdata = data;
 
   cairo_set_source_rgba(cr, rdata->alpha, 0, 0, 0.7);
   cairo_new_path(cr);
@@ -54,11 +56,12 @@ render(Aosd *aosd, cairo_t *cr, void* data) {
   cairo_restore(cr);
 }
 
-int main(int argc, char* argv[]) {
-  Aosd *aosd;
+int main(int argc, char* argv[])
+{
+  Aosd* aosd;
   RenderData data = {0};
 
-  const char *image = "/usr/share/pixmaps/gnome-background-image.png";
+  const char* image = "/usr/share/pixmaps/gnome-background-image.png";
   data.foot = cairo_image_surface_create_from_png(image);
   data.alpha = 0.5;
 
@@ -71,22 +74,26 @@ int main(int argc, char* argv[]) {
 
   aosd_main_iterations(aosd);
 
-  const int STEP = 1000;
+  const int STEP = 100;
   float dalpha = 0.05;
 
   struct timeval tv_nextupdate;
 
-  for (;;) {
+  for (;;)
+  {
     gettimeofday(&tv_nextupdate, NULL);
-    tv_nextupdate.tv_usec += STEP*100;
+    tv_nextupdate.tv_usec += STEP * 1000;
 
     aosd_main_until(aosd, &tv_nextupdate);
 
     data.alpha += dalpha;
-    if (data.alpha >= 1.0) {
+    if (data.alpha >= 1.0)
+    {
       data.alpha = 1.0;
       dalpha = -dalpha;
-    } else if (data.alpha <= 0.0) {
+    }
+    else if (data.alpha <= 0.0)
+    {
       data.alpha = 0.0;
       dalpha = -dalpha;
     }
@@ -99,4 +106,4 @@ int main(int argc, char* argv[]) {
   return 0;
 }
 
-/* vim: set ts=2 sw=2 et cino=(0 : */
+/* vim: set ts=2 sw=2 et : */
