@@ -29,7 +29,7 @@ render_text(Aosd* aosd, cairo_t* cr, void* data)
 }
 
 Aosd*
-aosd_text_new(const char* markup, int x, int y)
+aosd_new_text(const char* markup, int x, int y)
 {
   Aosd* aosd;
   PangoContext* context;
