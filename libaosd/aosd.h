@@ -66,7 +66,7 @@ void aosd_set_name(Aosd* aosd, XClassHint* name);
 void aosd_set_transparency(Aosd* aosd, AosdTransparency mode);
 void aosd_set_geometry(Aosd* aosd, int x, int y, int width, int height);
 void aosd_set_renderer(Aosd* aosd, AosdRenderer renderer, void* user_data,
-                       void (*user_data_d)(void*));
+    void (*user_data_d)(void*));
 void aosd_set_mouse_event_cb(Aosd* aosd, AosdMouseEventCb cb, void* user_data);
 
 /* manual object manipulators */
@@ -81,4 +81,4 @@ void aosd_flash(Aosd* aosd, int fade_ms, int total_display_ms);
 
 #endif /* __AOSD_H__ */
 
-/* vim: set ts=2 sw=2 et cino=(0 : */
+/* vim: set ts=2 sw=2 et : */

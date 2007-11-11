@@ -56,4 +56,4 @@ aosd_text_new(const char* markup, int x, int y)
   return aosd;
 }
 
-/* vim: set ts=2 sw=2 et cino=(0 : */
+/* vim: set ts=2 sw=2 et : */

@@ -180,7 +180,8 @@ aosd_flash(Aosd* aosd, int fade_ms, int total_display_ms)
   /* fade in */
   for (flash.alpha = 0; flash.alpha < 1.0; flash.alpha += dalpha)
   {
-    if (flash.alpha > 1.0) flash.alpha = 1.0;
+    if (flash.alpha > 1.0)
+      flash.alpha = 1.0;
     aosd_render(aosd);
 
     gettimeofday(&tv_nextupdate, NULL);
@@ -218,4 +219,4 @@ aosd_flash(Aosd* aosd, int fade_ms, int total_display_ms)
   aosd_main_until(aosd, &tv_nextupdate);
 }
 
-/* vim: set ts=2 sw=2 et cino=(0 : */
+/* vim: set ts=2 sw=2 et : */

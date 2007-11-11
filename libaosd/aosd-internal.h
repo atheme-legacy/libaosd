@@ -57,4 +57,4 @@ Bool composite_check_ext_and_mgr(Display*, int);
 Visual* composite_find_argb_visual(Display*, int);
 #endif
 
-/* vim: set ts=2 sw=2 et cino=(0 : */
+/* vim: set ts=2 sw=2 et : */

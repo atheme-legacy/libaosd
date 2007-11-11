@@ -161,8 +161,8 @@ aosd_set_geometry(Aosd* aosd, int x, int y, int width, int height)
 }
 
 void
-aosd_set_renderer(Aosd* aosd, AosdRenderer renderer,
-                  void* user_data, void (*user_data_d)(void*))
+aosd_set_renderer(Aosd* aosd, AosdRenderer renderer, void* user_data,
+    void (*user_data_d)(void*))
 {
   if (aosd == NULL)
     return;
@@ -208,7 +208,7 @@ aosd_render(Aosd* aosd)
     if (aosd->mode == TRANSPARENCY_FAKE)
       /* make our own copy of the background pixmap as the initial surface */
       XCopyArea(dsp, aosd->background.pixmap, pixmap, gc,
-                0, 0, width, height, 0, 0);
+          0, 0, width, height, 0, 0);
     else
       XFillRectangle(dsp, pixmap, gc, 0, 0, width, height);
   }
@@ -277,4 +277,4 @@ aosd_hide(Aosd* aosd)
   XUnmapWindow(aosd->display, aosd->win);
 }
 
-/* vim: set ts=2 sw=2 et cino=(0 : */
+/* vim: set ts=2 sw=2 et : */

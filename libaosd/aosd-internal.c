@@ -72,9 +72,10 @@ make_window(Aosd* aosd)
       aosd->colormap = att.colormap =
         XCreateColormap(dsp, root_win, visual, AllocNone);
       aosd->win = XCreateWindow(dsp, root_win,
-        -1, -1, 1, 1, 0, 32, InputOutput, visual, CWBackingStore | CWBackPixel |
-        CWBackPixmap | CWBorderPixel | CWColormap | CWEventMask | CWSaveUnder |
-        CWOverrideRedirect, &att);
+          -1, -1, 1, 1, 0, 32, InputOutput, visual,
+          CWBackingStore | CWBackPixel | CWBackPixmap | CWBorderPixel |
+          CWColormap | CWEventMask | CWSaveUnder | CWOverrideRedirect,
+          &att);
     }
     else
 #endif
@@ -87,9 +88,9 @@ make_window(Aosd* aosd)
   else
   {
     aosd->win = XCreateWindow(dsp, root_win,
-      -1, -1, 1, 1, 0, CopyFromParent, InputOutput, CopyFromParent,
-      CWBackingStore | CWBackPixel | CWBackPixmap | CWBorderPixel |
-      CWEventMask | CWSaveUnder | CWOverrideRedirect, &att);
+        -1, -1, 1, 1, 0, CopyFromParent, InputOutput, CopyFromParent,
+        CWBackingStore | CWBackPixel | CWBackPixmap | CWBorderPixel |
+        CWEventMask | CWSaveUnder | CWOverrideRedirect, &att);
   }
 
   set_window_properties(dsp, aosd->win);
@@ -137,8 +138,8 @@ set_window_properties(Display* dsp, Window win)
   }
   mwm_hints_setting = { (1L<<1), 0L, 0L, 0L };
 
-  XChangeProperty(dsp, win, mwm_hints, mwm_hints, 32, PropModeReplace,
-                  (unsigned char *)&mwm_hints_setting, 4);
+  XChangeProperty(dsp, win, mwm_hints, mwm_hints, 32,
+      PropModeReplace, (unsigned char *)&mwm_hints_setting, 4);
 
   /* always on top, not in taskbar or pager. */
   Atom win_state = XInternAtom(dsp, "_NET_WM_STATE", False);
@@ -148,8 +149,8 @@ set_window_properties(Display* dsp, Window win)
     XInternAtom(dsp, "_NET_WM_STATE_SKIP_TASKBAR", False),
     XInternAtom(dsp, "_NET_WM_STATE_SKIP_PAGER", False)
   };
-  XChangeProperty(dsp, win, win_state, XA_ATOM, 32, PropModeReplace,
-                  (unsigned char*)&win_state_setting, 3);
+  XChangeProperty(dsp, win, win_state, XA_ATOM, 32,
+      PropModeReplace, (unsigned char*)&win_state_setting, 3);
 }
 
 #ifdef HAVE_XCOMPOSITE
@@ -183,7 +184,8 @@ composite_find_argb_visual(Display* dsp, int scr)
   template.class = TrueColor;
 
   xvi = XGetVisualInfo(dsp,
-      VisualScreenMask | VisualDepthMask | VisualClassMask, &template, &nvi);
+      VisualScreenMask | VisualDepthMask | VisualClassMask,
+      &template, &nvi);
 
   if (xvi == NULL)
     return NULL;
@@ -204,4 +206,4 @@ composite_find_argb_visual(Display* dsp, int scr)
 }
 #endif
 
-/* vim: set ts=2 sw=2 et cino=(0 : */
+/* vim: set ts=2 sw=2 et : */
