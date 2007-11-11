@@ -1,4 +1,5 @@
-/* ghosd -- OSD with fake transparency, cairo, and pango.
+/* aosd -- OSD with fake transparency, cairo, and pango.
+ *
  * Copyright (C) 2006 Evan Martin <martine@danga.com>
  */
 

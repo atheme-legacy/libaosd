@@ -1,4 +1,5 @@
-/* ghosd -- OSD with fake transparency, cairo, and pango.
+/* aosd -- OSD with transparency, cairo, and pango.
+ *
  * Copyright (C) 2006 Evan Martin <martine@danga.com>
  *
  * some additions by Trent Apted <trent@apted.net>
@@ -49,13 +50,13 @@ static unsigned LINES = 1;
 static unsigned AGE_MS = 0;
 
 static const char * FONTDESC = "Trebuchet 30";
-static const char * EXAMPLE_TEXT = "some sample text using <b>ghosd</b>";
+static const char * EXAMPLE_TEXT = "some sample text using <b>libaosd</b>";
 
 static const int RECT_PADDING = 3; /** Padding for rectangle */
 #ifndef VERSION
 static const char * const VERSION = "0.0.2";
 #endif
-static const char * const REVISION = "$Rev$";
+static const char * const REVISION = "1";
 static const char * const BUILD_TIME = __DATE__ " at " __TIME__;
 static const char * const USAGE =
     "Usage: %s [OPTION] [TEXT]...\n"
@@ -396,7 +397,7 @@ do_render(PangoLayout *layout, int unref_layout) {
     aosd_set_geometry(aosd, 0, 0, 1, 1);
     aosd_flash(aosd, 0, 0);
     aosd_hide(aosd); /* doesn't seem to do anything to fix */
-    /* ghosd_destroy(ghosd); */ /* ditto -- does nothing to remove the pixel */
+    /* aosd_destroy(aosd); */ /* ditto -- does nothing to remove the pixel */
 
     if (unref_layout)
         g_object_unref(layout);

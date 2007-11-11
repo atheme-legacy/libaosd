@@ -1,4 +1,5 @@
-/* ghosd -- OSD with fake transparency, cairo, and pango.
+/* aosd -- OSD with fake transparency, cairo, and pango.
+ *
  * Copyright (C) 2006 Evan Martin <martine@danga.com>
  */
 
@@ -18,7 +19,7 @@ int main(int argc, char* argv[]) {
   Aosd* aosd;
 
   aosd = aosd_text_new("<span font_desc='Trebuchet 30'>"
-                        "some sample text using <b>aosd</b>"
+                        "some sample text using <b>libaosd</b>"
                         "اريد"
                         "</span>", -50, -50);
 
