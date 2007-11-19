@@ -7,8 +7,6 @@
 
 #include <pango/pangocairo.h>
 
-#include <X11/Xlib.h>
-
 #include "aosd-internal.h"
 #include "aosd-text.h"
 
