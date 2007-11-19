@@ -15,4 +15,4 @@ include ../extra.mk
 
 CPPFLAGS += ${LIB_CPPFLAGS} ${AUX_CFLAGS} -I..
 CFLAGS += ${LIB_CFLAGS}
-LIBS += ${AUX_LDFLAGS}
+LIBS += ${X_LIBS} ${AUX_LDFLAGS}
