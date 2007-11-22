@@ -46,7 +46,6 @@ render_text(Aosd* aosd, cairo_t* cr, void* data)
   pango_cairo_show_layout(cr, back);
 
   /* clean up */
-  pango_attr_list_unref(attrs);
   pango_attr_list_unref(new_attrs);
   g_object_unref(back);
 
