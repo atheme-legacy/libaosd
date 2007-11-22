@@ -12,6 +12,8 @@
 
 #include <libaosd/aosd.h>
 
+Bool clicked = False;
+
 typedef struct {
   cairo_surface_t* foot;
   float alpha;
@@ -56,6 +58,12 @@ render(Aosd* aosd, cairo_t* cr, void* data)
   cairo_restore(cr);
 }
 
+static void
+mouse_callback(Aosd* aosd, AosdMouseEvent* event, void* user_data)
+{
+  clicked = True;
+}
+
 int main(int argc, char* argv[])
 {
   Aosd* aosd;
@@ -67,6 +75,7 @@ int main(int argc, char* argv[])
 
   aosd = aosd_new();
   aosd_set_transparency(aosd, TRANSPARENCY_COMPOSITE);
+  aosd_set_mouse_event_cb(aosd, mouse_callback, NULL);
   aosd_set_geometry(aosd, 50, 50, 180, 230);
   aosd_set_renderer(aosd, render, &data, NULL);
 
@@ -79,7 +88,7 @@ int main(int argc, char* argv[])
 
   struct timeval tv_nextupdate;
 
-  for (;;)
+  do
   {
     gettimeofday(&tv_nextupdate, NULL);
     tv_nextupdate.tv_usec += STEP * 1000;
@@ -98,7 +107,7 @@ int main(int argc, char* argv[])
       dalpha = -dalpha;
     }
     aosd_render(aosd);
-  }
+  } while (!clicked);
 
   cairo_surface_destroy(data.foot);
   aosd_destroy(aosd);
