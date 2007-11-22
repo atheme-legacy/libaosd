@@ -13,10 +13,20 @@
 static gboolean
 filter(PangoAttribute* attr, gpointer data)
 {
-  if (attr->klass->type == PANGO_ATTR_FOREGROUND)
-    return FALSE;
+  switch (attr->klass->type)
+  {
+    /* Attributes we don't want to be replicated */
+    case PANGO_ATTR_FOREGROUND:
+    case PANGO_ATTR_BACKGROUND:
+    case PANGO_ATTR_UNDERLINE:
+    case PANGO_ATTR_UNDERLINE_COLOR:
+    case PANGO_ATTR_STRIKETHROUGH:
+    case PANGO_ATTR_STRIKETHROUGH_COLOR:
+      return FALSE;
 
-  return TRUE;
+    default:
+      return TRUE;
+  }
 }
 
 static void
@@ -24,7 +34,7 @@ render_text(Aosd* aosd, cairo_t* cr, void* data)
 {
   PangoLayout* layout = data;
 
-  /* get a copy of the layout and kill its foreground */
+  /* get a copy of the layout and filter its attributes */
   PangoLayout* back = pango_layout_copy(layout);
   PangoAttrList* attrs = pango_layout_get_attributes(back);
   PangoAttrList* new_attrs = pango_attr_list_filter(attrs, filter, NULL);
