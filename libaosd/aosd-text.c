@@ -61,6 +61,7 @@ aosd_destroy_text(Aosd* aosd)
   if (aosd == NULL || aosd->layout == NULL)
     return;
 
+  g_object_unref(pango_layout_get_context(aosd->layout));
   g_object_unref(aosd->layout);
 }
 
