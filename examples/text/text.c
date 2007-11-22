@@ -21,7 +21,7 @@ main(int argc, char* argv[])
   Aosd* aosd;
 
   aosd = aosd_new_text(
-      "<span font_desc='Times New Roman 30'>"
+      "<span font_desc='Times New Roman 30' color='green'>"
       "some sample text using <b>libaosd</b>\n"
       "some unicode: Ελληνικά · 한국어 · עברית ·"
       " ქართული · كورد"

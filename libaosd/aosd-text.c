@@ -10,15 +10,35 @@
 #include "aosd-internal.h"
 #include "aosd-text.h"
 
+static gboolean
+filter(PangoAttribute* attr, gpointer data)
+{
+  if (attr->klass->type == PANGO_ATTR_FOREGROUND)
+    return FALSE;
+
+  return TRUE;
+}
+
 static void
 render_text(Aosd* aosd, cairo_t* cr, void* data)
 {
   PangoLayout* layout = data;
 
-  /* drop shadow */
-  cairo_set_source_rgba(cr, 0, 0, 0, 0.8);
-  cairo_move_to(cr, 4, 4);
-  pango_cairo_show_layout(cr, layout);
+  /* get a copy of the layout and kill its foreground */
+  PangoLayout* back = pango_layout_copy(layout);
+  PangoAttrList* attrs = pango_layout_get_attributes(back);
+  PangoAttrList* new_attrs = pango_attr_list_filter(attrs, filter, NULL);
+  pango_layout_set_attributes(back, new_attrs);
+
+  /* drop half-opaque shadow */
+  cairo_set_source_rgba(cr, 0, 0, 0, 0.5);
+  cairo_move_to(cr, 3, 3);
+  pango_cairo_show_layout(cr, back);
+
+  /* clean up */
+  pango_attr_list_unref(attrs);
+  pango_attr_list_unref(new_attrs);
+  g_object_unref(back);
 
   /* and the actual text */
   cairo_set_source_rgba(cr, 1, 1, 1, 1.0);
