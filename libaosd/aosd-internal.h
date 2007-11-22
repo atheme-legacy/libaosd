@@ -12,6 +12,8 @@
 
 #include "aosd.h"
 
+#include "pango/pangocairo.h"
+
 typedef struct
 {
   AosdRenderer render_cb;
@@ -40,6 +42,7 @@ struct _Aosd
   Window win;
   Visual* visual;
   Colormap colormap;
+  PangoLayout* layout;
   int x, y, width, height;
 
   AosdBackground background;
@@ -51,6 +54,8 @@ struct _Aosd
 void make_window(Aosd*);
 void set_window_properties(Display*, Window);
 Pixmap take_snapshot(Aosd*);
+
+void aosd_destroy_text(Aosd*);
 
 #ifdef HAVE_XCOMPOSITE
 Bool composite_check_ext_and_mgr(Display*, int);

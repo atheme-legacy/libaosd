@@ -48,10 +48,20 @@ aosd_new_text(const char* markup, int x, int y)
   const int height = ink_rect.y + ink_rect.height + 5;
 
   aosd = aosd_new();
+  aosd->layout = layout;
   aosd_set_geometry(aosd, x, y, width, height);
   aosd_set_renderer(aosd, render_text, layout, g_object_unref);
   
   return aosd;
+}
+
+void
+aosd_destroy_text(Aosd* aosd)
+{
+  if (aosd == NULL || aosd->layout == NULL)
+    return;
+
+  g_object_unref(aosd->layout);
 }
 
 /* vim: set ts=2 sw=2 et : */
