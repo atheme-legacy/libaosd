@@ -217,6 +217,14 @@ aosd_flash(Aosd* aosd, int fade_ms, int total_display_ms)
   gettimeofday(&tv_nextupdate, NULL);
   tv_nextupdate.tv_usec += 500 * 1000;
   aosd_main_until(aosd, &tv_nextupdate);
+
+  aosd_hide(aosd);
+
+  /* restore initial renderer */
+  aosd_set_renderer(aosd,
+      flash.user_render.render_cb,
+      flash.user_render.data,
+      flash.user_render.data_destroyer);
 }
 
 /* vim: set ts=2 sw=2 et : */
