@@ -37,8 +37,12 @@ render_text(Aosd* aosd, cairo_t* cr, void* data)
   /* get a copy of the layout and filter its attributes */
   PangoLayout* back = pango_layout_copy(layout);
   PangoAttrList* attrs = pango_layout_get_attributes(back);
-  PangoAttrList* new_attrs = pango_attr_list_filter(attrs, filter, NULL);
-  pango_layout_set_attributes(back, new_attrs);
+  PangoAttrList* new_attrs = NULL;
+  if (attrs != NULL)
+  {
+    new_attrs = pango_attr_list_filter(attrs, filter, NULL);
+    pango_layout_set_attributes(back, new_attrs);
+  }
 
   /* drop half-opaque shadow */
   cairo_set_source_rgba(cr, 0, 0, 0, 0.5);
@@ -46,7 +50,8 @@ render_text(Aosd* aosd, cairo_t* cr, void* data)
   pango_cairo_show_layout(cr, back);
 
   /* clean up */
-  pango_attr_list_unref(new_attrs);
+  if (attrs != NULL)
+    pango_attr_list_unref(new_attrs);
   g_object_unref(back);
 
   /* and the actual text */
