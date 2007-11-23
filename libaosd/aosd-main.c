@@ -28,6 +28,9 @@
 static void
 aosd_main_iteration(Aosd* aosd)
 {
+  if (aosd == NULL)
+    return;
+
   Display* dsp = aosd->display;
   XEvent ev, pev;
   XNextEvent(dsp, &ev);
@@ -87,6 +90,9 @@ aosd_main_iteration(Aosd* aosd)
 void
 aosd_main_iterations(Aosd* aosd)
 {
+  if (aosd == NULL)
+    return;
+
   while (XPending(aosd->display))
     aosd_main_iteration(aosd);
 }
@@ -94,9 +100,15 @@ aosd_main_iterations(Aosd* aosd)
 void
 aosd_main_until(Aosd* aosd, struct timeval* until)
 {
-  struct timeval tv_now;
+  if (aosd == NULL)
+    return;
 
   aosd_main_iterations(aosd);
+
+  if (until == NULL)
+    return;
+
+  struct timeval tv_now;
 
   for (;;)
   {
@@ -167,6 +179,9 @@ flash_destroy(void* data)
 void
 aosd_flash(Aosd* aosd, int fade_ms, int total_display_ms)
 {
+  if (aosd == NULL)
+    return;
+
   AosdFlashData flash = {0};
   memcpy(&flash.user_render, &aosd->renderer, sizeof(RenderCallback));
   aosd_set_renderer(aosd, flash_render, &flash, flash_destroy);
