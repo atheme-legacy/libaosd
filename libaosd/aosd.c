@@ -83,7 +83,7 @@ aosd_get_geometry(Aosd* aosd, int* x, int* y, int* width, int* height)
   if (x != NULL)
     *x = (aosd == NULL) ? 0 : aosd->x;
   if (y != NULL)
-    *y = (aosd == NULL) ? 0 : aosd->x;
+    *y = (aosd == NULL) ? 0 : aosd->y;
   if (width != NULL)
     *width  = (aosd == NULL) ? 0 : aosd->width;
   if (height != NULL)
@@ -174,7 +174,7 @@ void aosd_set_position(Aosd* aosd,
     if (ordinate == AOSD_COORD_CENTER)
       y /= 2;
 
-  x += x_offset;
+  y += y_offset;
 
   aosd_set_geometry(aosd, x, y, width, height);
 }
