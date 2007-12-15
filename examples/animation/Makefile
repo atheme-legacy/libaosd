@@ -5,5 +5,5 @@ SRCS = animation.c
 include ../../buildsys.mk
 include ../../extra.mk
 
-CPPFLAGS += ${AUX_CFLAGS} -I../..
-LDFLAGS += ${AUX_LDFLAGS} -L../../libaosd -laosd
+CPPFLAGS += ${CAIRO_CFLAGS} -I../..
+LDFLAGS += ${CAIRO_LIBS} -L../../libaosd -laosd

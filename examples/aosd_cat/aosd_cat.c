@@ -8,19 +8,15 @@
 #define _GNU_SOURCE
 #include <stdio.h>
 
-#include <cairo/cairo.h>
+#include <libaosd/aosd.h>
+
 #include <pango/pangocairo.h>
 #include <time.h>
 #include <unistd.h>
 
-#include <X11/Xlib.h>
-
 #include <getopt.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <libaosd/aosd.h>
-#include <libaosd/aosd-text.h>
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -429,7 +425,8 @@ do_render(PangoLayout* layout, int unref_layout)
       aosd_set_transparency(aosd, TRANSPARENCY_COMPOSITE);
     }
 
-    aosd_set_geometry(aosd, XPOS, YPOS, width, height);
+    aosd_set_position(aosd, AOSD_COORD_MAXIMUM, AOSD_COORD_MAXIMUM,
+        width, height, XPOS, YPOS);
   }
 
   aosd_set_renderer(aosd, render, layout);

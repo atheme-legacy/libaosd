@@ -11,6 +11,6 @@ INCLUDES = aosd.h
 include ../buildsys.mk
 include ../extra.mk
 
-CPPFLAGS += ${LIB_CPPFLAGS} ${AUX_CFLAGS} -I..
+CPPFLAGS += ${LIB_CPPFLAGS} ${X_CFLAGS} ${CAIRO_CFLAGS} -I..
 CFLAGS += ${LIB_CFLAGS}
-LIBS += ${X_LIBS} ${AUX_LDFLAGS}
+LIBS += ${X_LIBS} ${CAIRO_LIBS}
