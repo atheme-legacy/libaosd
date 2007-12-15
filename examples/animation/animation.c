@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
   aosd_set_transparency(aosd, TRANSPARENCY_COMPOSITE);
   aosd_set_mouse_event_cb(aosd, mouse_callback, NULL);
   aosd_set_geometry(aosd, 50, 50, 180, 230);
-  aosd_set_renderer(aosd, render, &data, NULL);
+  aosd_set_renderer(aosd, render, &data);
 
   aosd_show(aosd);
 

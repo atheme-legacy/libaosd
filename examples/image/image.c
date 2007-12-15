@@ -150,7 +150,7 @@ main(int argc, char* argv[])
   aosd_set_geometry(aosd,
       opts.x, opts.y, width + (2 * MARGIN), height + (2 * MARGIN));
 
-  aosd_set_renderer(aosd, render, image, NULL);
+  aosd_set_renderer(aosd, render, image);
 
   aosd_flash(aosd, 300, 3000);
 

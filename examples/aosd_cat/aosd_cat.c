@@ -432,7 +432,7 @@ do_render(PangoLayout* layout, int unref_layout)
     aosd_set_geometry(aosd, XPOS, YPOS, width, height);
   }
 
-  aosd_set_renderer(aosd, render, layout, g_object_unref);
+  aosd_set_renderer(aosd, render, layout);
   aosd_flash(aosd, FADE_MS, TIME_MS);
 
   /* Why do we have to do it again??
