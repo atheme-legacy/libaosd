@@ -67,7 +67,9 @@ void aosd_get_geometry(Aosd* aosd, int* x, int* y, int* width, int* height);
 void aosd_set_name(Aosd* aosd, XClassHint* name);
 void aosd_set_transparency(Aosd* aosd, AosdTransparency mode);
 void aosd_set_geometry(Aosd* aosd, int x, int y, int width, int height);
-void aosd_set_position(Aosd* aosd,
+void aosd_set_position(Aosd* aosd, unsigned pos, int width, int height);
+void aosd_set_position_offset(Aosd* aosd, int x_offset, int y_offset);
+void aosd_set_position_with_offset(Aosd* aosd,
     AosdCoordinate abscissa, AosdCoordinate ordinate, int width, int height,
     int x_offset, int y_offset);
 void aosd_set_renderer(Aosd* aosd, AosdRenderer renderer, void* user_data);

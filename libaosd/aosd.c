@@ -145,7 +145,30 @@ aosd_set_geometry(Aosd* aosd, int x, int y, int width, int height)
   XMoveResizeWindow(aosd->display, aosd->win, x, y, width, height);
 }
 
-void aosd_set_position(Aosd* aosd,
+void
+aosd_set_position(Aosd* aosd, unsigned pos, int width, int height)
+{
+  if (aosd == NULL)
+    return;
+
+  if (pos > 8)
+    pos = 4;
+
+  aosd_set_position_with_offset(aosd, pos % 3, pos / 3, width, height, 0, 0);
+}
+
+void
+aosd_set_position_offset(Aosd* aosd, int x_offset, int y_offset)
+{
+  if (aosd == NULL)
+    return;
+
+  aosd_set_geometry(aosd, aosd->x + x_offset, aosd->y + y_offset,
+      aosd->width, aosd->height);
+}
+
+void
+aosd_set_position_with_offset(Aosd* aosd,
     AosdCoordinate abscissa, AosdCoordinate ordinate, int width, int height,
     int x_offset, int y_offset)
 {
