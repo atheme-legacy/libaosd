@@ -81,7 +81,7 @@ aosd_main_iteration(Aosd* aosd)
         mev.button = ev.xbutton.button;
         mev.send_event = ev.xbutton.send_event;
         mev.time = ev.xbutton.time;
-        aosd->mouse_processor.mouse_event_cb(aosd, &mev, aosd->mouse_processor.data);
+        aosd->mouse_processor.mouse_event_cb(&mev, aosd->mouse_processor.data);
       }
       break;
   }
@@ -139,13 +139,14 @@ aosd_main_until(Aosd* aosd, struct timeval* until)
 
 typedef struct
 {
+  int width, height;
   cairo_surface_t* surface;
   float alpha;
   RenderCallback user_render;
 } AosdFlashData;
 
 static void
-flash_render(Aosd* aosd, cairo_t* cr, void* data)
+flash_render(cairo_t* cr, void* data)
 {
   AosdFlashData* flash = data;
 
@@ -154,9 +155,9 @@ flash_render(Aosd* aosd, cairo_t* cr, void* data)
   {
     cairo_t* rendered_cr;
     flash->surface = cairo_surface_create_similar(cairo_get_target(cr),
-        CAIRO_CONTENT_COLOR_ALPHA, aosd->width, aosd->height);
+        CAIRO_CONTENT_COLOR_ALPHA, flash->width, flash->height);
     rendered_cr = cairo_create(flash->surface);
-    flash->user_render.render_cb(aosd, rendered_cr, flash->user_render.data);
+    flash->user_render.render_cb(rendered_cr, flash->user_render.data);
     cairo_destroy(rendered_cr);
   }
 
@@ -185,6 +186,8 @@ aosd_flash(Aosd* aosd, int fade_ms, int total_display_ms)
   AosdFlashData flash = {0};
   memcpy(&flash.user_render, &aosd->renderer, sizeof(RenderCallback));
   aosd_set_renderer(aosd, flash_render, &flash, flash_destroy);
+  flash.width = aosd->width;
+  flash.height = aosd->height;
 
   aosd_show(aosd);
 

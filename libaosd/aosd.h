@@ -44,9 +44,8 @@ typedef struct
 AosdMouseEvent;
 
 /* various callbacks */
-typedef void (*AosdRenderer)(Aosd* aosd, cairo_t* cr, void* user_data);
-typedef void (*AosdMouseEventCb)(Aosd* aosd, AosdMouseEvent* event,
-                                 void* user_data);
+typedef void (*AosdRenderer)(cairo_t* cr, void* user_data);
+typedef void (*AosdMouseEventCb)(AosdMouseEvent* event, void* user_data);
 
 typedef enum
 {

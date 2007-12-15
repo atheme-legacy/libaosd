@@ -41,7 +41,7 @@ round_rect(cairo_t* cr, int x, int y, int w, int h, int r)
 }
 
 static void
-render(Aosd* aosd, cairo_t* cr, void* data)
+render(cairo_t* cr, void* data)
 {
   cairo_surface_t* image = data;
   const int width  = cairo_image_surface_get_width(image);

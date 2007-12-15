@@ -252,7 +252,7 @@ aosd_render(Aosd* aosd)
 
     /* draw some stuff */
     cairo_t* cr = cairo_create(surf);
-    aosd->renderer.render_cb(aosd, cr, aosd->renderer.data);
+    aosd->renderer.render_cb(cr, aosd->renderer.data);
     cairo_destroy(cr);
     cairo_surface_destroy(surf);
   }

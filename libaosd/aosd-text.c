@@ -30,7 +30,7 @@ filter(PangoAttribute* attr, gpointer data)
 }
 
 static void
-render_text(Aosd* aosd, cairo_t* cr, void* data)
+render_text(cairo_t* cr, void* data)
 {
   PangoLayout* layout = data;
 

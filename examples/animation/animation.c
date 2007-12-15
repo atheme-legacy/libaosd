@@ -37,7 +37,7 @@ round_rect(cairo_t* cr, int x, int y, int w, int h, int r)
 #define RADIUS 40
 
 static void
-render(Aosd* aosd, cairo_t* cr, void* data)
+render(cairo_t* cr, void* data)
 {
   RenderData* rdata = data;
 
@@ -59,7 +59,7 @@ render(Aosd* aosd, cairo_t* cr, void* data)
 }
 
 static void
-mouse_callback(Aosd* aosd, AosdMouseEvent* event, void* user_data)
+mouse_callback(AosdMouseEvent* event, void* user_data)
 {
   clicked = True;
 }

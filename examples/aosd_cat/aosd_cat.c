@@ -390,7 +390,7 @@ parse_opts(int argc, char* argv[])
 }
 
 static void
-render(Aosd* aosd, cairo_t* cr, void* data)
+render(cairo_t* cr, void* data)
 {
   PangoLayout* layout = data;
 
