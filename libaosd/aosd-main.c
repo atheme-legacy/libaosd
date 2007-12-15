@@ -167,16 +167,6 @@ flash_render(cairo_t* cr, void* data)
   cairo_paint_with_alpha(cr, flash->alpha);
 }
 
-/* we don't need to free the flashdata object, because we stack-allocate that.
- * but we do need to let the old user data free itself... */
-static void
-flash_destroy(void* data)
-{
-  AosdFlashData* flash = data;
-  if (flash->user_render.data_destroyer)
-    flash->user_render.data_destroyer(flash->user_render.data);
-}
-
 void
 aosd_flash(Aosd* aosd, int fade_ms, int total_display_ms)
 {
@@ -185,7 +175,7 @@ aosd_flash(Aosd* aosd, int fade_ms, int total_display_ms)
 
   AosdFlashData flash = {0};
   memcpy(&flash.user_render, &aosd->renderer, sizeof(RenderCallback));
-  aosd_set_renderer(aosd, flash_render, &flash, flash_destroy);
+  aosd_set_renderer(aosd, flash_render, &flash);
   flash.width = aosd->width;
   flash.height = aosd->height;
 
@@ -241,8 +231,7 @@ aosd_flash(Aosd* aosd, int fade_ms, int total_display_ms)
   /* restore initial renderer */
   aosd_set_renderer(aosd,
       flash.user_render.render_cb,
-      flash.user_render.data,
-      flash.user_render.data_destroyer);
+      flash.user_render.data);
 }
 
 /* vim: set ts=2 sw=2 et : */

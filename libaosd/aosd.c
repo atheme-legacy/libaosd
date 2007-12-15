@@ -183,15 +183,13 @@ void aosd_set_position(Aosd* aosd,
 }
 
 void
-aosd_set_renderer(Aosd* aosd, AosdRenderer renderer, void* user_data,
-    void (*user_data_d)(void*))
+aosd_set_renderer(Aosd* aosd, AosdRenderer renderer, void* user_data)
 {
   if (aosd == NULL)
     return;
 
   aosd->renderer.render_cb = renderer;
   aosd->renderer.data = user_data;
-  aosd->renderer.data_destroyer = user_data_d;
 }
 
 void

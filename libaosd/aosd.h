@@ -70,8 +70,7 @@ void aosd_set_geometry(Aosd* aosd, int x, int y, int width, int height);
 void aosd_set_position(Aosd* aosd,
     AosdCoordinate abscissa, AosdCoordinate ordinate, int width, int height,
     int x_offset, int y_offset);
-void aosd_set_renderer(Aosd* aosd, AosdRenderer renderer, void* user_data,
-    void (*user_data_d)(void*));
+void aosd_set_renderer(Aosd* aosd, AosdRenderer renderer, void* user_data);
 void aosd_set_mouse_event_cb(Aosd* aosd, AosdMouseEventCb cb, void* user_data);
 
 /* manual object manipulators */

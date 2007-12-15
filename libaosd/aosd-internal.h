@@ -18,7 +18,6 @@ typedef struct
 {
   AosdRenderer render_cb;
   void* data;
-  void (*data_destroyer)(void*);
 } RenderCallback;
 
 typedef struct

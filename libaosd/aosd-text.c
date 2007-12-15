@@ -84,7 +84,7 @@ aosd_new_text(const char* markup, int x, int y)
   aosd = aosd_new();
   aosd->layout = layout;
   aosd_set_geometry(aosd, x, y, width, height);
-  aosd_set_renderer(aosd, render_text, layout, g_object_unref);
+  aosd_set_renderer(aosd, render_text, layout);
   
   return aosd;
 }
