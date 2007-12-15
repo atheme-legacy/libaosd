@@ -140,27 +140,46 @@ aosd_set_geometry(Aosd* aosd, int x, int y, int width, int height)
   if (aosd == NULL)
     return;
 
-  Display* dsp = aosd->display;
-  int scr = aosd->screen_num;
-  const int dsp_width  = DisplayWidth(dsp, scr);
-  const int dsp_height = DisplayHeight(dsp, scr);
-
-  if (x == AOSD_COORD_CENTER)
-    x = (dsp_width - width) / 2;
-  else if (x < 0)
-    x = (dsp_width - width) + x;
-
-  if (y == AOSD_COORD_CENTER)
-    y = (dsp_height - height) / 2;
-  else if (y < 0)
-    y = (dsp_height - height) + y;
-
   aosd->x      = x;
   aosd->y      = y;
   aosd->width  = width;
   aosd->height = height;
 
-  XMoveResizeWindow(dsp, aosd->win, x, y, width, height);
+  XMoveResizeWindow(aosd->display, aosd->win, x, y, width, height);
+}
+
+void aosd_set_position(Aosd* aosd,
+    AosdCoordinate abscissa, AosdCoordinate ordinate, int width, int height,
+    int x_offset, int y_offset)
+{
+  if (aosd == NULL)
+    return;
+
+  Display* dsp = aosd->display;
+  int scr = aosd->screen_num;
+  const int dsp_width  = DisplayWidth(dsp, scr);
+  const int dsp_height = DisplayHeight(dsp, scr);
+
+  int x = dsp_width - width;
+  int y = dsp_height - height;
+
+  if (abscissa == AOSD_COORD_MINIMUM)
+    x = 0;
+  else
+    if (abscissa == AOSD_COORD_CENTER)
+      x /= 2;
+
+  x += x_offset;
+
+  if (ordinate == AOSD_COORD_MINIMUM)
+    y = 0;
+  else
+    if (ordinate == AOSD_COORD_CENTER)
+      y /= 2;
+
+  x += x_offset;
+
+  aosd_set_geometry(aosd, x, y, width, height);
 }
 
 void

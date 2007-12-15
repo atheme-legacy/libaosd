@@ -15,13 +15,16 @@
 
 #include <cairo/cairo.h>
 
-#include <limits.h>  /* INT_MAX */
 #include <sys/time.h>  /* timeval */
 
 /* global object type */
 typedef struct _Aosd Aosd;
 
-#define AOSD_COORD_CENTER INT_MAX
+typedef enum {
+  AOSD_COORD_MINIMUM = 0,
+  AOSD_COORD_CENTER,
+  AOSD_COORD_MAXIMUM
+} AosdCoordinate;
 
 /* minimal struct to handle mouse events */
 typedef struct
@@ -65,6 +68,9 @@ void aosd_get_geometry(Aosd* aosd, int* x, int* y, int* width, int* height);
 void aosd_set_name(Aosd* aosd, XClassHint* name);
 void aosd_set_transparency(Aosd* aosd, AosdTransparency mode);
 void aosd_set_geometry(Aosd* aosd, int x, int y, int width, int height);
+void aosd_set_position(Aosd* aosd,
+    AosdCoordinate abscissa, AosdCoordinate ordinate, int width, int height,
+    int x_offset, int y_offset);
 void aosd_set_renderer(Aosd* aosd, AosdRenderer renderer, void* user_data,
     void (*user_data_d)(void*));
 void aosd_set_mouse_event_cb(Aosd* aosd, AosdMouseEventCb cb, void* user_data);
