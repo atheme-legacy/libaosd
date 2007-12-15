@@ -5,5 +5,5 @@ SRCS = aosd_cat.c
 include ../../buildsys.mk
 include ../../extra.mk
 
-CPPFLAGS += ${AUX_CFLAGS} -I../../
-LDFLAGS += ${AUX_LDFLAGS} -L../../libaosd -laosd
+CPPFLAGS += ${AUX_CFLAGS} ${TEXT_CFLAGS} -I../../
+LDFLAGS += ${AUX_LDFLAGS} ${TEXT_LDFLAGS} -L../../libaosd -laosd

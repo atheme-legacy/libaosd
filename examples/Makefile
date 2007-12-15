@@ -1,6 +1,5 @@
 SUBDIRS = animation \
 	  aosd_cat \
-	  image \
-	  text
+	  image
 
 include ../buildsys.mk

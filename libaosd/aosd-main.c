@@ -21,8 +21,6 @@
 
 #include <X11/Xlib.h>
 
-#include <pango/pango-layout.h>
-
 #include "aosd-internal.h"
 
 static void

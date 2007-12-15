@@ -52,9 +52,6 @@ aosd_destroy(Aosd* aosd)
   if (aosd == NULL)
     return;
 
-  if (aosd->layout != NULL)
-    aosd_destroy_text(aosd);
-
   aosd->root_win = None;
   make_window(aosd);
 

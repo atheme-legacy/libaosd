@@ -4,11 +4,9 @@ LIB_MINOR = 0
 
 SRCS = aosd.c \
        aosd-internal.c \
-       aosd-main.c \
-       aosd-text.c
+       aosd-main.c
 
-INCLUDES = aosd.h \
-	   aosd-text.h
+INCLUDES = aosd.h
 
 include ../buildsys.mk
 include ../extra.mk

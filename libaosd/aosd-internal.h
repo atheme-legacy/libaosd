@@ -12,8 +12,6 @@
 
 #include "aosd.h"
 
-#include "pango/pangocairo.h"
-
 typedef struct
 {
   AosdRenderer render_cb;
@@ -41,7 +39,6 @@ struct _Aosd
   Window win;
   Visual* visual;
   Colormap colormap;
-  PangoLayout* layout;
   int x, y, width, height;
 
   AosdBackground background;

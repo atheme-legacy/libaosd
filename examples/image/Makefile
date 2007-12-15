@@ -5,5 +5,5 @@ SRCS = image.c
 include ../../buildsys.mk
 include ../../extra.mk
 
-CPPFLAGS += ${AUX_CFLAGS} -I../../
-LDFLAGS += ${AUX_LDFLAGS} -L../../libaosd -laosd
+CPPFLAGS += ${AUX_CFLAGS} ${GLIB_CFLAGS} -I../../
+LDFLAGS += ${AUX_LDFLAGS} ${GLIB_LDFLAGS} -L../../libaosd -laosd
