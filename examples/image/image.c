@@ -15,12 +15,14 @@
 struct
 {
   gboolean transparent;
+  int pos;
   int x, y;
   int alpha;
   char* filename;
 } opts =
 {
   TRUE,
+  4,
   0, 0,
   50,
   NULL
@@ -77,10 +79,12 @@ parse_options(int* argc, char** argv[])
 
   GOptionEntry coords[] =
   {
+    { "position", 'p', 0, G_OPTION_ARG_INT,
+      (gpointer)&opts.pos, "window position (0:8)"},
     { "x", 'x', G_OPTION_FLAG_NOALIAS, G_OPTION_ARG_INT,
-      (gpointer)&opts.x, "x coordinate for window" },
+      (gpointer)&opts.x, "x offset coordinate for window" },
     { "y", 'y', G_OPTION_FLAG_NOALIAS, G_OPTION_ARG_INT,
-      (gpointer)&opts.y, "y coordinate for window" },
+      (gpointer)&opts.y, "y offset coordinate for window" },
     { NULL }
   };
 
@@ -103,7 +107,7 @@ parse_options(int* argc, char** argv[])
     g_option_context_add_group(ctx, group);
 
   ADD_GROUP("display", "Display Options:", "Show display help options", display, FALSE);
-  ADD_GROUP("coords", "Coordinates Options:", "Show coordinates help options", coords, FALSE);
+  ADD_GROUP("coords", "Position Options:", "Show position help options", coords, FALSE);
   ADD_GROUP("image", "Image Options:", "Show image help options", image, TRUE);
 #undef ADD_GROUP
 
@@ -115,10 +119,9 @@ parse_options(int* argc, char** argv[])
       opts.filename == NULL)
     return FALSE;
 
-  if (opts.x == 0)
-    opts.x = AOSD_COORD_CENTER;
-  if (opts.y == 0)
-    opts.y = AOSD_COORD_CENTER;
+  if (opts.pos < 0 ||
+      opts.pos > 8)
+    opts.pos = 4;
 
   if (opts.alpha < 0)
     opts.alpha = 0;
@@ -147,8 +150,8 @@ main(int argc, char* argv[])
   aosd_set_transparency(aosd,
       opts.transparent ? TRANSPARENCY_COMPOSITE : TRANSPARENCY_NONE);
 
-  aosd_set_geometry(aosd,
-      opts.x, opts.y, width + (2 * MARGIN), height + (2 * MARGIN));
+  aosd_set_position(aosd, opts.pos, width + 2 * MARGIN, height + 2 * MARGIN);
+  aosd_set_position_offset(aosd, opts.x, opts.y);
 
   aosd_set_renderer(aosd, render, image);
 
