@@ -155,7 +155,7 @@ main(int argc, char* argv[])
 
   aosd_set_renderer(aosd, render, image);
 
-  aosd_flash(aosd, 300, 3000);
+  aosd_flash(aosd, 300, 3000, 300);
 
   cairo_surface_destroy(image);
   aosd_destroy(aosd);
