@@ -91,6 +91,21 @@ aosd_get_geometry(Aosd* aosd, int* x, int* y, int* width, int* height)
 }
 
 void
+aosd_get_screen_size(Aosd* aosd, int* width, int* height)
+{
+  if (aosd == NULL)
+    return;
+
+  Display* dsp = aosd->display;
+  int scr = aosd->screen_num;
+
+  if (width != NULL)
+    *width = DisplayWidth(dsp, scr);
+  if (height != NULL)
+    *height = DisplayHeight(dsp, scr);
+}
+
+void
 aosd_set_name(Aosd* aosd, XClassHint* name)
 {
   Bool flag = False;
@@ -175,10 +190,9 @@ aosd_set_position_with_offset(Aosd* aosd,
   if (aosd == NULL)
     return;
 
-  Display* dsp = aosd->display;
-  int scr = aosd->screen_num;
-  const int dsp_width  = DisplayWidth(dsp, scr);
-  const int dsp_height = DisplayHeight(dsp, scr);
+  int dsp_width, dsp_height;
+
+  aosd_get_screen_size(aosd, &dsp_width, &dsp_height);
 
   int x = dsp_width - width;
   int y = dsp_height - height;

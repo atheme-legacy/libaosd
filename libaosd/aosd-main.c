@@ -135,6 +135,18 @@ aosd_main_until(Aosd* aosd, struct timeval* until)
   }
 }
 
+void
+aosd_main_for(Aosd* aosd, unsigned loop_ms)
+{
+  if (aosd == NULL)
+    return;
+
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  tv.tv_usec += loop_ms * 1000;
+  aosd_main_until(aosd, &tv);
+}
+
 typedef struct
 {
   int width, height;
@@ -166,7 +178,8 @@ flash_render(cairo_t* cr, void* data)
 }
 
 void
-aosd_flash(Aosd* aosd, int fade_ms, int total_display_ms)
+aosd_flash(Aosd* aosd,
+    unsigned fade_in_ms, unsigned full_ms, unsigned fade_out_ms)
 {
   if (aosd == NULL)
     return;
@@ -177,52 +190,39 @@ aosd_flash(Aosd* aosd, int fade_ms, int total_display_ms)
   flash.width = aosd->width;
   flash.height = aosd->height;
 
+  float step;
+
+  if (fade_in_ms  != 0 ||
+      full_ms     != 0 ||
+      fade_out_ms != 0)
   aosd_show(aosd);
 
-  const int STEP_MS = 50;
-  const float dalpha = 1.0 / (fade_ms / (float)STEP_MS);
-  struct timeval tv_nextupdate;
-
-  /* fade in */
-  for (flash.alpha = 0; flash.alpha < 1.0; flash.alpha += dalpha)
+  if (fade_in_ms != 0)
   {
-    if (flash.alpha > 1.0)
-      flash.alpha = 1.0;
-    aosd_render(aosd);
-
-    gettimeofday(&tv_nextupdate, NULL);
-    tv_nextupdate.tv_usec += STEP_MS * 1000;
-    aosd_main_until(aosd, &tv_nextupdate);
+    step = 1.0 / (float)fade_in_ms;
+    for (flash.alpha = 0; flash.alpha < 1.0; flash.alpha += step)
+    {
+      aosd_render(aosd);
+      aosd_main_for(aosd, step);
+    }
   }
 
-  /* full display */
-  flash.alpha = 1.0;
-  aosd_render(aosd);
-
-  gettimeofday(&tv_nextupdate, NULL);
-  tv_nextupdate.tv_usec += (total_display_ms - (2 * fade_ms)) * 1000;
-  aosd_main_until(aosd, &tv_nextupdate);
-
-  /* fade out */
-  for (flash.alpha = 1.0; flash.alpha > 0.0; flash.alpha -= dalpha)
+  if (full_ms != 0)
   {
+    flash.alpha = 1.0;
     aosd_render(aosd);
-
-    gettimeofday(&tv_nextupdate, NULL);
-    tv_nextupdate.tv_usec += STEP_MS * 1000;
-    aosd_main_until(aosd, &tv_nextupdate);
+    aosd_main_for(aosd, full_ms);
   }
 
-  flash.alpha = 0;
-  aosd_render(aosd);
-
-  /* display for another half-second,
-   * because otherwise the fade out attracts your eye
-   * and then you'll see a flash while it repaints where the aosd was.
-   */
-  gettimeofday(&tv_nextupdate, NULL);
-  tv_nextupdate.tv_usec += 500 * 1000;
-  aosd_main_until(aosd, &tv_nextupdate);
+  if (fade_out_ms != 0)
+  {
+    step = 1.0 / (float)fade_out_ms;
+    for (flash.alpha = 1.0; flash.alpha > 0.0; flash.alpha -= step)
+    {
+      aosd_render(aosd);
+      aosd_main_for(aosd, step);
+    }
+  }
 
   aosd_hide(aosd);
 

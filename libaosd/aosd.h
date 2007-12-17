@@ -62,6 +62,7 @@ void aosd_destroy(Aosd* aosd);
 void aosd_get_name(Aosd* aosd, XClassHint* result);
 AosdTransparency aosd_get_transparency(Aosd* aosd);
 void aosd_get_geometry(Aosd* aosd, int* x, int* y, int* width, int* height);
+void aosd_get_screen_size(Aosd* aosd, int* width, int* height);
 
 /* object configurators */
 void aosd_set_name(Aosd* aosd, XClassHint* name);
@@ -83,7 +84,9 @@ void aosd_hide(Aosd* aosd);
 /* automatic object manipulators */
 void aosd_main_iterations(Aosd* aosd);
 void aosd_main_until(Aosd* aosd, struct timeval* until);
-void aosd_flash(Aosd* aosd, int fade_ms, int total_display_ms);
+void aosd_main_for(Aosd* aosd, unsigned loop_ms);
+void aosd_flash(Aosd* aosd, unsigned fade_in_ms,
+    unsigned full_ms, unsigned fade_out_ms);
 
 #endif /* __AOSD_H__ */
 
