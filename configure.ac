@@ -67,7 +67,15 @@ AC_ARG_ENABLE(pangocairo,
 
 if test "$enable_pangocairo" = "yes"; then
     PKG_CHECK_MODULES(PANGOCAIRO, pangocairo,
-	[EXAMPLES+=" aosd_cat"], [enable_pangocairo="no"])
+	[
+	 EXAMPLES+=" aosd_cat"
+	 TEXT_SRCS="aosd-text.c"
+	 TEXT_INCLUDES="aosd-text.h"
+	],
+	[
+	 enable_pangocairo="no"
+	]
+    )
 else
     enable_pangocairo="no"
 fi
@@ -94,6 +102,8 @@ AC_SUBST(PANGOCAIRO_CFLAGS)
 AC_SUBST(PANGOCAIRO_LIBS)
 AC_SUBST(GLIB_CFLAGS)
 AC_SUBST(GLIB_LIBS)
+AC_SUBST(TEXT_SRCS)
+AC_SUBST(TEXT_INCLUDES)
 
 AC_CONFIG_FILES(
     [
