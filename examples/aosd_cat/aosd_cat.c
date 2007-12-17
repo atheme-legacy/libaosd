@@ -425,12 +425,12 @@ do_render(PangoLayout* layout, int unref_layout)
       aosd_set_transparency(aosd, TRANSPARENCY_COMPOSITE);
     }
 
-    aosd_set_position(aosd, AOSD_COORD_MAXIMUM, AOSD_COORD_MAXIMUM,
+    aosd_set_position_with_offset(aosd, AOSD_COORD_MAXIMUM, AOSD_COORD_MAXIMUM,
         width, height, XPOS, YPOS);
   }
 
   aosd_set_renderer(aosd, render, layout);
-  aosd_flash(aosd, FADE_MS, TIME_MS);
+  aosd_flash(aosd, FADE_MS, TIME_MS, FADE_MS);
 
   /* Why do we have to do it again??
    * A: Otherwise, the area below the popup remains the background at the time
@@ -439,7 +439,7 @@ do_render(PangoLayout* layout, int unref_layout)
    * Unforunately, it needs to be on-screen otherwise we get an X-Window error.
    */
   aosd_set_geometry(aosd, 0, 0, 1, 1);
-  aosd_flash(aosd, 0, 0);
+  aosd_flash(aosd, 0, 0, 0);
   aosd_hide(aosd); /* doesn't seem to do anything to fix */
   /* aosd_destroy(aosd); */ /* ditto -- does nothing to remove the pixel */
 
