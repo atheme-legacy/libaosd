@@ -27,6 +27,12 @@ typedef struct
 
   struct
   {
+    guint8 x_offset;
+    guint8 y_offset;
+  } geom;
+
+  struct
+  {
     char* color;
     guint8 opacity;
   } back;

@@ -141,7 +141,9 @@ aosd_text_renderer(cairo_t* cr, TextRenderData* data)
         col.blue    / (double)65535,
         data->shadow.opacity / (double)255);
 
-    cairo_move_to(cr, data->shadow.x_offset + data->lbearing, data->shadow.y_offset);
+    cairo_move_to(cr,
+        data->geom.x_offset + data->shadow.x_offset + data->lbearing,
+        data->geom.y_offset + data->shadow.y_offset);
     pango_cairo_show_layout(cr, lay);
 
     if (new_attrs != NULL)
@@ -174,7 +176,9 @@ aosd_text_renderer(cairo_t* cr, TextRenderData* data)
         col.blue  / (double)65535,
         data->fore.opacity / (double)255);
 
-    cairo_move_to(cr, data->lbearing, 0);
+    cairo_move_to(cr,
+        data->geom.x_offset + data->lbearing,
+        data->geom.y_offset);
     pango_cairo_show_layout(cr, lay);
 
     if (new_attrs != NULL)
