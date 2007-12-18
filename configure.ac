@@ -68,7 +68,7 @@ AC_ARG_ENABLE(pangocairo,
 if test "$enable_pangocairo" = "yes"; then
     PKG_CHECK_MODULES(PANGOCAIRO, pangocairo,
 	[
-	 EXAMPLES+=" aosd_cat"
+	 EXAMPLES+=" aosd_cat scroller"
 	 TEXT_SRCS="aosd-text.c"
 	 TEXT_INCLUDES="aosd-text.h"
 	],
