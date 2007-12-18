@@ -3,9 +3,9 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 
-Name: libaosd
-Description: An Atheme OSD framework with Cairo and XComposite transparency
+Name: libaosd-text
+Description: Convenient Pango wrappers and text renderer implementation
 Version: @PACKAGE_VERSION@
-Requires: @PACKAGES@
-Libs: -L${libdir} -laosd
+Requires: pangocairo
+Libs: -L${libdir} -laosd-text
 Cflags: -I${includedir}/libaosd

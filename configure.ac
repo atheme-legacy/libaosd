@@ -1,6 +1,6 @@
 AC_PREREQ(2.54)
 
-AC_INIT([libaosd], [0.1.4], [http://bugzilla.atheme.org/])
+AC_INIT([libaosd], [0.2.0], [http://bugzilla.atheme.org/])
 AC_CONFIG_HEADER([config.h])
 
 AC_CANONICAL_HOST
@@ -69,8 +69,8 @@ if test "$enable_pangocairo" = "yes"; then
     PKG_CHECK_MODULES(PANGOCAIRO, pangocairo,
 	[
 	 EXAMPLES+=" aosd_cat scroller"
-	 TEXT_SRCS="aosd-text.c"
-	 TEXT_INCLUDES="aosd-text.h"
+	 TEXT_DIR="libaosd-text"
+	 TEXT_PKGCONF="libaosd-text.pc"
 	],
 	[
 	 enable_pangocairo="no"
@@ -102,14 +102,15 @@ AC_SUBST(PANGOCAIRO_CFLAGS)
 AC_SUBST(PANGOCAIRO_LIBS)
 AC_SUBST(GLIB_CFLAGS)
 AC_SUBST(GLIB_LIBS)
-AC_SUBST(TEXT_SRCS)
-AC_SUBST(TEXT_INCLUDES)
+AC_SUBST(TEXT_DIR)
+AC_SUBST(TEXT_PKGCONF)
 
 AC_CONFIG_FILES(
     [
      buildsys.mk
      extra.mk
      libaosd.pc
+     ${TEXT_PKGCONF}
     ]
 )
 AC_OUTPUT
