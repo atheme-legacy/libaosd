@@ -56,6 +56,9 @@ setup(void)
   if (aosd_get_transparency(data.aosd) != TRANSPARENCY_COMPOSITE)
     aosd_set_transparency(data.aosd, TRANSPARENCY_NONE);
 
+  data.rend.geom.x_offset = 10;
+  data.rend.geom.y_offset = 10;
+
   data.rend.back.color = "white";
   data.rend.back.opacity = 80;
 
@@ -72,7 +75,7 @@ setup(void)
 
   int wid;
   aosd_get_screen_size(data.aosd, &wid, NULL);
-  wid -= data.rend.shadow.x_offset + 2;
+  wid -= 2 * data.rend.geom.x_offset + data.rend.shadow.x_offset + 2;
   pango_layout_set_width(data.rend.lay, wid * PANGO_SCALE);
   pango_layout_set_wrap(data.rend.lay, PANGO_WRAP_WORD_CHAR);
   pango_layout_set_alignment(data.rend.lay, PANGO_ALIGN_RIGHT);
@@ -85,8 +88,8 @@ set_string(const char* text)
   pango_layout_get_size_aosd(data.rend.lay,
       &data.width, &data.height, &data.rend.lbearing);
 
-  data.width  += data.rend.shadow.x_offset;
-  data.height += data.rend.shadow.y_offset;
+  data.width  += 2 * data.rend.geom.x_offset + data.rend.shadow.x_offset;
+  data.height += 2 * data.rend.geom.y_offset + data.rend.shadow.y_offset;
 }
 
 static void
