@@ -7,16 +7,15 @@
 
 #define _GNU_SOURCE
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <getopt.h>
+
+#include <sys/time.h>
 
 #include <libaosd/aosd.h>
 
 #include <pango/pangocairo.h>
-#include <time.h>
-#include <unistd.h>
-
-#include <getopt.h>
-#include <stdlib.h>
-#include <string.h>
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -425,7 +424,7 @@ do_render(PangoLayout* layout, int unref_layout)
       aosd_set_transparency(aosd, TRANSPARENCY_COMPOSITE);
     }
 
-    aosd_set_position_with_offset(aosd, AOSD_COORD_MAXIMUM, AOSD_COORD_MAXIMUM,
+    aosd_set_position_with_offset(aosd, COORDINATE_MAXIMUM, COORDINATE_MAXIMUM,
         width, height, XPOS, YPOS);
   }
 

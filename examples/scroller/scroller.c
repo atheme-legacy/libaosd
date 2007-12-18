@@ -29,19 +29,19 @@ scroll(void)
   y += data.height - 1;
   for (i = 1; i <= data.height; i += step)
   {
-    aosd_main_for(data.aosd, 20);
+    aosd_loop_for(data.aosd, 20);
     aosd_set_geometry(data.aosd, x, y -= step, data.width, i);
   }
 
   aosd_set_position(data.aosd, pos, data.width, data.height);
   aosd_set_position_offset(data.aosd, -1, -1);
   aosd_get_geometry(data.aosd, &x, &y, NULL, NULL);
-  aosd_main_for(data.aosd, 2000);
+  aosd_loop_for(data.aosd, 2000);
 
   for (i = data.height; i >= 1; i -= step)
   {
     aosd_set_geometry(data.aosd, x, y += step, data.width, i);
-    aosd_main_for(data.aosd, 20);
+    aosd_loop_for(data.aosd, 20);
   }
 
   aosd_hide(data.aosd);

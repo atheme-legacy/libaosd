@@ -3,11 +3,6 @@
  * Copyright (C) 2006 Evan Martin <martine@danga.com>
  */
 
-#include <stdio.h>
-#include <sys/time.h>
-#include <sys/poll.h>
-#include <time.h>
-
 #include <cairo/cairo.h>
 
 #include <libaosd/aosd.h>
@@ -81,20 +76,12 @@ int main(int argc, char* argv[])
 
   aosd_show(aosd);
 
-  aosd_main_iterations(aosd);
+  aosd_loop_once(aosd);
 
-  const int STEP = 100;
   float dalpha = 0.05;
-
-  struct timeval tv_nextupdate;
 
   do
   {
-    gettimeofday(&tv_nextupdate, NULL);
-    tv_nextupdate.tv_usec += STEP * 1000;
-
-    aosd_main_until(aosd, &tv_nextupdate);
-
     data.alpha += dalpha;
     if (data.alpha >= 1.0)
     {
@@ -106,7 +93,9 @@ int main(int argc, char* argv[])
       data.alpha = 0.0;
       dalpha = -dalpha;
     }
+
     aosd_render(aosd);
+    aosd_loop_for(aosd, 100);
   } while (!clicked);
 
   cairo_surface_destroy(data.foot);
