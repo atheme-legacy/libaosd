@@ -15,15 +15,14 @@
 
 #include <cairo/cairo.h>
 
-#include <sys/time.h>  /* timeval */
-
 /* global object type */
 typedef struct _Aosd Aosd;
 
+// relative coordinates for positioning
 typedef enum {
-  AOSD_COORD_MINIMUM = 0,
-  AOSD_COORD_CENTER,
-  AOSD_COORD_MAXIMUM
+  COORDINATE_MINIMUM = 0,
+  COORDINATE_CENTER,
+  COORDINATE_MAXIMUM
 } AosdCoordinate;
 
 /* minimal struct to handle mouse events */
@@ -34,7 +33,6 @@ typedef struct
   // global coordinates
   int x_root, y_root;
 
-  // whether we should send the event further
   int send_event;
 
   // button being pressed
@@ -76,15 +74,16 @@ void aosd_set_position_with_offset(Aosd* aosd,
 void aosd_set_renderer(Aosd* aosd, AosdRenderer renderer, void* user_data);
 void aosd_set_mouse_event_cb(Aosd* aosd, AosdMouseEventCb cb, void* user_data);
 
-/* manual object manipulators */
+/* object manipulators */
 void aosd_render(Aosd* aosd);
 void aosd_show(Aosd* aosd);
 void aosd_hide(Aosd* aosd);
 
-/* automatic object manipulators */
-void aosd_main_iterations(Aosd* aosd);
-void aosd_main_until(Aosd* aosd, struct timeval* until);
-void aosd_main_for(Aosd* aosd, unsigned loop_ms);
+/* X main loop processing */
+void aosd_loop_once(Aosd* aosd);
+void aosd_loop_for(Aosd* aosd, unsigned loop_ms);
+
+/* automatic object manipulator */
 void aosd_flash(Aosd* aosd, unsigned fade_in_ms,
     unsigned full_ms, unsigned fade_out_ms);
 

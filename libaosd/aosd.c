@@ -197,18 +197,18 @@ aosd_set_position_with_offset(Aosd* aosd,
   int x = dsp_width - width;
   int y = dsp_height - height;
 
-  if (abscissa == AOSD_COORD_MINIMUM)
+  if (abscissa == COORDINATE_MINIMUM)
     x = 0;
   else
-    if (abscissa == AOSD_COORD_CENTER)
+    if (abscissa == COORDINATE_CENTER)
       x /= 2;
 
   x += x_offset;
 
-  if (ordinate == AOSD_COORD_MINIMUM)
+  if (ordinate == COORDINATE_MINIMUM)
     y = 0;
   else
-    if (ordinate == AOSD_COORD_CENTER)
+    if (ordinate == COORDINATE_CENTER)
       y /= 2;
 
   y += y_offset;

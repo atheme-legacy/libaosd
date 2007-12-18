@@ -8,27 +8,21 @@
  * - added/changed some other stuff
  */
 
-#include "config.h"
-
 #include <stdio.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
-#include <unistd.h>
-#include <errno.h>
 
 #include <sys/poll.h>
+#include <sys/time.h>
 
 #include <X11/Xlib.h>
 
 #include "aosd-internal.h"
 
 static void
-aosd_main_iteration(Aosd* aosd)
+aosd_loop_iteration(Aosd* aosd)
 {
-  if (aosd == NULL)
-    return;
-
   Display* dsp = aosd->display;
   XEvent ev, pev;
   XNextEvent(dsp, &ev);
@@ -54,16 +48,12 @@ aosd_main_iteration(Aosd* aosd)
     case ConfigureNotify:
       if (aosd->width > 0)
       {
-        /* XXX if the window manager disagrees with our positioning here,
-         * we loop. */
+        /* FIXME We might loop here if window manager
+         * disagrees with our positioning */
         if (aosd->x != ev.xconfigure.x ||
             aosd->y != ev.xconfigure.y)
-        {
-          // width = ev.xconfigure.width; 
-          // height = ev.xconfigure.height;
-          XMoveResizeWindow(dsp,
-              aosd->win, aosd->x, aosd->y, aosd->width, aosd->height);
-        }
+          XMoveResizeWindow(dsp, aosd->win,
+              aosd->x, aosd->y, aosd->width, aosd->height);
       }
       break;
 
@@ -86,33 +76,36 @@ aosd_main_iteration(Aosd* aosd)
 }
 
 void
-aosd_main_iterations(Aosd* aosd)
+aosd_loop_once(Aosd* aosd)
 {
   if (aosd == NULL)
     return;
 
   while (XPending(aosd->display))
-    aosd_main_iteration(aosd);
+    aosd_loop_iteration(aosd);
 }
 
 void
-aosd_main_until(Aosd* aosd, struct timeval* until)
+aosd_loop_for(Aosd* aosd, unsigned loop_ms)
 {
   if (aosd == NULL)
     return;
 
-  aosd_main_iterations(aosd);
+  aosd_loop_once(aosd);
 
-  if (until == NULL)
+  if (loop_ms == 0)
     return;
 
   struct timeval tv_now;
+  struct timeval tv_until;
+  gettimeofday(&tv_until, NULL);
+  tv_until.tv_usec += loop_ms * 1000;
 
   for (;;)
   {
     gettimeofday(&tv_now, NULL);
-    int dt = (until->tv_sec  - tv_now.tv_sec ) * 1000 +
-             (until->tv_usec - tv_now.tv_usec) / 1000;
+    int dt = (tv_until.tv_sec  - tv_now.tv_sec ) * 1000 +
+             (tv_until.tv_usec - tv_now.tv_usec) / 1000;
     if (dt <= 0)
       break;
 
@@ -131,20 +124,8 @@ aosd_main_until(Aosd* aosd, struct timeval* until)
       }
     }
     else
-      aosd_main_iterations(aosd);
+      aosd_loop_once(aosd);
   }
-}
-
-void
-aosd_main_for(Aosd* aosd, unsigned loop_ms)
-{
-  if (aosd == NULL)
-    return;
-
-  struct timeval tv;
-  gettimeofday(&tv, NULL);
-  tv.tv_usec += loop_ms * 1000;
-  aosd_main_until(aosd, &tv);
 }
 
 typedef struct
@@ -203,7 +184,7 @@ aosd_flash(Aosd* aosd,
     for (flash.alpha = 0; flash.alpha < 1.0; flash.alpha += step)
     {
       aosd_render(aosd);
-      aosd_main_for(aosd, step);
+      aosd_loop_for(aosd, step);
     }
   }
 
@@ -211,7 +192,7 @@ aosd_flash(Aosd* aosd,
   {
     flash.alpha = 1.0;
     aosd_render(aosd);
-    aosd_main_for(aosd, full_ms);
+    aosd_loop_for(aosd, full_ms);
   }
 
   if (fade_out_ms != 0)
@@ -220,7 +201,7 @@ aosd_flash(Aosd* aosd,
     for (flash.alpha = 1.0; flash.alpha > 0.0; flash.alpha -= step)
     {
       aosd_render(aosd);
-      aosd_main_for(aosd, step);
+      aosd_loop_for(aosd, step);
     }
   }
 
