@@ -4,6 +4,9 @@
  */
 
 #include <string.h>
+#include <stdlib.h>
+#include <wchar.h>
+#include <locale.h>
 
 #include "aosd-text.h"
 
@@ -41,6 +44,63 @@ pango_layout_get_size_aosd(PangoLayout* lay,
     *height = PANGO_DESCENT(log);
   if (lbearing != NULL)
     *lbearing = -ink.x;
+}
+
+void
+pango_layout_set_text_aosd(PangoLayout* lay, char* text)
+{
+  if (lay == NULL || text == NULL)
+    return;
+
+  size_t len = 0;
+  gboolean good = FALSE;
+
+  char* locale = setlocale(LC_ALL, NULL);
+  setlocale(LC_ALL, "en_US.UTF-8");
+
+  if ((len = mbstowcs(NULL, text, 0)) == -1)
+    goto failed;
+
+  len++;
+  char* lf = "\n";
+  char* nl = " "; // U+2028, i.e. newline
+
+  wchar_t wlf, wnl;
+
+  if (mbtowc(&wlf, lf, strlen(lf)) == -1)
+    goto failed;
+  if (mbtowc(&wnl, nl, strlen(nl)) == -1)
+    goto failed;
+
+  wchar_t* string = calloc(1, len * sizeof(wchar_t));
+  wchar_t* ptr;
+
+  if (mbstowcs(string, text, len) == -1)
+    goto free_up;
+
+  while ((ptr = wcschr(string, wlf)) != NULL)
+    *ptr = wnl;
+
+  if ((len = wcstombs(NULL, string, 0)) == -1)
+    goto free_up;
+
+  len++;
+  char* newstr = calloc(1, len * sizeof(char));
+
+  if (wcstombs(newstr, string, len) == -1)
+    goto free_up2;
+
+  good = TRUE;
+  pango_layout_set_text(lay, newstr, -1);
+
+free_up2:
+  free(newstr);
+free_up:
+  free(string);
+failed:
+  setlocale(LC_ALL, locale);
+  if (!good)
+    pango_layout_set_text(lay, text, -1);
 }
 
 void
