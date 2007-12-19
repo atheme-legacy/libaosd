@@ -16,7 +16,7 @@ void pango_layout_unref_aosd(PangoLayout* lay);
 void pango_layout_get_size_aosd(PangoLayout* lay,
     unsigned* width, unsigned* height, int* lbearing);
 
-// Converts all \n occurences into U+2028 symbol
+// Converts all \n occurrences into U+2028 symbol
 void pango_layout_set_text_aosd(PangoLayout* lay, char* text);
 void pango_layout_set_attr_aosd(PangoLayout* lay, PangoAttribute* attr);
 void pango_layout_set_font_aosd(PangoLayout* lay, char* font_desc);
