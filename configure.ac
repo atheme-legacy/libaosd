@@ -1,6 +1,6 @@
 AC_PREREQ(2.54)
 
-AC_INIT([libaosd], [0.2.0], [http://bugzilla.atheme.org/])
+AC_INIT([libaosd], [0.2.1], [http://bugzilla.atheme.org/])
 AC_CONFIG_HEADER([config.h])
 
 AC_CANONICAL_HOST
@@ -50,7 +50,7 @@ if test "$enable_xcomposite" = "yes"; then
 	 AC_DEFINE([HAVE_XCOMPOSITE], [1], [X Composite extension available])
 	],
 	[
-	 AC_MSG_WARN(can't find xcomposite package)
+	 AC_MSG_WARN(can't find xcomposite package, real transparency won't be supported)
 	 enable_xcomposite="no"
 	]
     )
@@ -73,6 +73,7 @@ if test "$enable_pangocairo" = "yes"; then
 	 TEXT_PKGCONF="libaosd-text.pc"
 	],
 	[
+	 AC_MSG_WARN(can't find pangocairo package, textual helpers won't be built)
 	 enable_pangocairo="no"
 	]
     )
