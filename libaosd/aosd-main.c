@@ -206,6 +206,7 @@ aosd_flash(Aosd* aosd,
   }
 
   aosd_hide(aosd);
+  aosd_loop_once(aosd);
 
   /* restore initial renderer */
   aosd_set_renderer(aosd,
