@@ -75,6 +75,7 @@ void aosd_set_position_with_offset(Aosd* aosd,
     int x_offset, int y_offset);
 void aosd_set_renderer(Aosd* aosd, AosdRenderer renderer, void* user_data);
 void aosd_set_mouse_event_cb(Aosd* aosd, AosdMouseEventCb cb, void* user_data);
+void aosd_set_hide_upon_mouse_event(Aosd* aosd); // replaces AosdMouseEventCb
 
 /* object manipulators */
 void aosd_render(Aosd* aosd);

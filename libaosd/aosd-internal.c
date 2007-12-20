@@ -122,6 +122,15 @@ take_snapshot(Aosd* aosd)
 }
 
 void
+aosd_hider(AosdMouseEvent* event, void* user_data)
+{
+  Aosd* aosd = user_data;
+
+  aosd_hide(aosd);
+  aosd_loop_once(aosd);
+}
+
+void
 set_window_properties(Display* dsp, Window win)
 {
   /* we're almost a _NET_WM_WINDOW_TYPE_SPLASH, but we don't want

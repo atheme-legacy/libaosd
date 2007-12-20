@@ -51,7 +51,7 @@ void make_window(Aosd*);
 void set_window_properties(Display*, Window);
 Pixmap take_snapshot(Aosd*);
 
-void aosd_destroy_text(Aosd*);
+void aosd_hider(AosdMouseEvent* event, void* user_data);
 
 #ifdef HAVE_XCOMPOSITE
 Bool composite_check_ext_and_mgr(Display*, int);

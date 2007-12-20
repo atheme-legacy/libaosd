@@ -266,6 +266,15 @@ aosd_set_mouse_event_cb(Aosd* aosd, AosdMouseEventCb cb, void* user_data)
 }
 
 void
+aosd_set_hide_upon_mouse_event(Aosd* aosd)
+{
+  if (aosd == NULL)
+    return;
+
+  aosd_set_mouse_event_cb(aosd, aosd_hider, aosd);
+}
+
+void
 aosd_render(Aosd* aosd)
 {
   if (aosd == NULL)
