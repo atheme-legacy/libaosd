@@ -34,7 +34,7 @@ make_window(Aosd* aosd)
     if (aosd->background.set)
     {
       XFreePixmap(dsp, aosd->background.pixmap);
-      aosd->background.set = 0;
+      aosd->background.set = False;
     }
 
     if (aosd->colormap != None)
@@ -119,15 +119,6 @@ take_snapshot(Aosd* aosd)
   XFreeGC(dsp, gc);
 
   return pixmap;
-}
-
-void
-aosd_hider(AosdMouseEvent* event, void* user_data)
-{
-  Aosd* aosd = user_data;
-
-  aosd_hide(aosd);
-  aosd_loop_once(aosd);
 }
 
 void

@@ -58,6 +58,9 @@ aosd_loop_iteration(Aosd* aosd)
       break;
 
     case ButtonPress:
+      if (aosd->mouse_hide)
+        aosd_hide(aosd);
+
       /* create AosdMouseEvent and pass it to callback function */
       if (aosd->mouse_processor.mouse_event_cb != NULL)
       {

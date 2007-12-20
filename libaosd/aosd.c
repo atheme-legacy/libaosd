@@ -159,20 +159,19 @@ aosd_set_names(Aosd* aosd, char* res_name, char* res_class)
 void
 aosd_set_transparency(Aosd* aosd, AosdTransparency mode)
 {
-  XClassHint* name;
-
   if (aosd == NULL || aosd->mode == mode)
     return;
 
   // we have to preserve window name
-  name = XAllocClassHint();
-  aosd_get_name(aosd, name);
+  XClassHint name;
+  aosd_get_name(aosd, &name);
 
   aosd->mode = mode;
   make_window(aosd);
 
-  aosd_set_name(aosd, name);
-  XFree(name);
+  aosd_set_name(aosd, &name);
+  XFree(name.res_name);
+  XFree(name.res_class);
 }
 
 void
@@ -266,12 +265,12 @@ aosd_set_mouse_event_cb(Aosd* aosd, AosdMouseEventCb cb, void* user_data)
 }
 
 void
-aosd_set_hide_upon_mouse_event(Aosd* aosd)
+aosd_set_hide_upon_mouse_event(Aosd* aosd, Bool enable)
 {
   if (aosd == NULL)
     return;
 
-  aosd_set_mouse_event_cb(aosd, aosd_hider, aosd);
+  aosd->mouse_hide = enable;
 }
 
 void
@@ -350,10 +349,10 @@ aosd_show(Aosd* aosd)
     if (aosd->background.set)
     {
       XFreePixmap(aosd->display, aosd->background.pixmap);
-      aosd->background.set = 0;
+      aosd->background.set = False;
     }
     aosd->background.pixmap = take_snapshot(aosd);
-    aosd->background.set = 1;
+    aosd->background.set = True;
   }
 
   aosd_render(aosd);
