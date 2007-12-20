@@ -12,6 +12,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <cairo/cairo-xlib-xrender.h>
 
@@ -68,6 +69,24 @@ aosd_get_name(Aosd* aosd, XClassHint* result)
   XGetClassHint(aosd->display, aosd->win, result);
 }
 
+void
+aosd_get_names(Aosd* aosd, char** res_name, char** res_class)
+{
+  if (aosd == NULL)
+    return;
+
+  XClassHint ret;
+  aosd_get_name(aosd, &ret);
+
+  if (res_name != NULL)
+    *res_name = strdup(ret.res_name);
+  XFree(ret.res_name);
+
+  if (res_class != NULL)
+    *res_class = strdup(ret.res_class);
+  XFree(ret.res_class);
+}
+
 AosdTransparency
 aosd_get_transparency(Aosd* aosd)
 {
@@ -116,8 +135,8 @@ aosd_set_name(Aosd* aosd, XClassHint* name)
   if (name == NULL)
   {
     name = XAllocClassHint();
-    name->res_class = "Atheme";
     name->res_name = "libaosd";
+    name->res_class = "Atheme";
     flag = True;
   }
 
@@ -125,6 +144,16 @@ aosd_set_name(Aosd* aosd, XClassHint* name)
 
   if (flag)
     XFree(name);
+}
+
+void
+aosd_set_names(Aosd* aosd, char* res_name, char* res_class)
+{
+  if (aosd == NULL)
+    return;
+
+  XClassHint name = {res_name, res_class};
+  aosd_set_name(aosd, &name);
 }
 
 void
