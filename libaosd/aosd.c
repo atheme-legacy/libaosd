@@ -357,6 +357,7 @@ aosd_show(Aosd* aosd)
 
   aosd_render(aosd);
   XMapRaised(aosd->display, aosd->win);
+  aosd->shown = True;
 }
 
 void
@@ -366,6 +367,7 @@ aosd_hide(Aosd* aosd)
     return;
 
   XUnmapWindow(aosd->display, aosd->win);
+  aosd->shown = False;
 }
 
 /* vim: set ts=2 sw=2 et : */

@@ -47,6 +47,7 @@ struct _Aosd
   MouseEventCallback mouse_processor;
 
   Bool mouse_hide;
+  Bool shown;
 };
 
 void make_window(Aosd*);
