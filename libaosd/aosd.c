@@ -124,6 +124,15 @@ aosd_get_screen_size(Aosd* aosd, int* width, int* height)
     *height = DisplayHeight(dsp, scr);
 }
 
+Bool
+aosd_get_is_shown(Aosd* aosd)
+{
+  if (aosd == NULL)
+    return False;
+
+  return aosd->shown;
+}
+
 void
 aosd_set_name(Aosd* aosd, XClassHint* name)
 {

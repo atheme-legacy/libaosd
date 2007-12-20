@@ -62,6 +62,7 @@ void aosd_get_names(Aosd* aosd, char** res_name, char** res_class);
 AosdTransparency aosd_get_transparency(Aosd* aosd);
 void aosd_get_geometry(Aosd* aosd, int* x, int* y, int* width, int* height);
 void aosd_get_screen_size(Aosd* aosd, int* width, int* height);
+Bool aosd_get_is_shown(Aosd* aosd);
 
 /* object configurators */
 void aosd_set_name(Aosd* aosd, XClassHint* name);
