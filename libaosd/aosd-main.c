@@ -96,7 +96,7 @@ aosd_loop_for(Aosd* aosd, unsigned loop_ms)
 
   aosd_loop_once(aosd);
 
-  if (loop_ms == 0)
+  if (loop_ms == 0 || !aosd->shown)
     return;
 
   struct timeval tv_now;
@@ -109,7 +109,7 @@ aosd_loop_for(Aosd* aosd, unsigned loop_ms)
     gettimeofday(&tv_now, NULL);
     int dt = (tv_until.tv_sec  - tv_now.tv_sec ) * 1000 +
              (tv_until.tv_usec - tv_now.tv_usec) / 1000;
-    if (dt <= 0)
+    if (dt <= 0 || !aosd->shown)
       break;
 
     struct pollfd pollfd = { ConnectionNumber(aosd->display), POLLIN, 0 };
@@ -180,37 +180,41 @@ aosd_flash(Aosd* aosd,
 
   float step;
 
-  aosd_show(aosd);
+  if (!aosd->shown)
+    aosd_show(aosd);
 
-  if (fade_in_ms != 0)
+  if (fade_in_ms != 0 && aosd->shown)
   {
     step = 1.0 / (float)fade_in_ms;
-    for (flash.alpha = 0; flash.alpha < 1.0; flash.alpha += step)
+    for (; flash.alpha < 1.0 && aosd->shown; flash.alpha += step)
     {
       aosd_render(aosd);
       aosd_loop_for(aosd, step);
     }
   }
 
-  if (full_ms != 0)
+  if (full_ms != 0 && aosd->shown)
   {
     flash.alpha = 1.0;
     aosd_render(aosd);
     aosd_loop_for(aosd, full_ms);
   }
 
-  if (fade_out_ms != 0)
+  if (fade_out_ms != 0 && aosd->shown)
   {
     step = 1.0 / (float)fade_out_ms;
-    for (flash.alpha = 1.0; flash.alpha > 0.0; flash.alpha -= step)
+    for (; flash.alpha > 0.0 && aosd->shown; flash.alpha -= step)
     {
       aosd_render(aosd);
       aosd_loop_for(aosd, step);
     }
   }
 
-  aosd_hide(aosd);
-  aosd_loop_once(aosd);
+  if (aosd->shown)
+  {
+    aosd_hide(aosd);
+    aosd_loop_once(aosd);
+  }
 
   /* restore initial renderer */
   aosd_set_renderer(aosd,
