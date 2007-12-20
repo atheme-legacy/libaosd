@@ -165,20 +165,21 @@ void
 aosd_flash(Aosd* aosd,
     unsigned fade_in_ms, unsigned full_ms, unsigned fade_out_ms)
 {
-  if (aosd == NULL)
+  if (aosd == NULL ||
+      (fade_in_ms == 0 &&
+       full_ms == 0 &&
+       fade_out_ms == 0))
     return;
 
   AosdFlashData flash = {0};
   memcpy(&flash.user_render, &aosd->renderer, sizeof(RenderCallback));
   aosd_set_renderer(aosd, flash_render, &flash);
+  flash.alpha = 0;
   flash.width = aosd->width;
   flash.height = aosd->height;
 
   float step;
 
-  if (fade_in_ms  != 0 ||
-      full_ms     != 0 ||
-      fade_out_ms != 0)
   aosd_show(aosd);
 
   if (fade_in_ms != 0)
