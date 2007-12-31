@@ -58,6 +58,9 @@ pango_layout_set_text_aosd(PangoLayout* lay, char* text)
   char* locale = setlocale(LC_ALL, NULL);
   setlocale(LC_ALL, "en_US.UTF-8");
 
+  if (strchr(text, '\n') == NULL)
+    goto failed;
+
   if ((len = mbstowcs(NULL, text, 0)) == -1)
     goto failed;
 
