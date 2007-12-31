@@ -181,7 +181,10 @@ aosd_flash(Aosd* aosd,
   float step;
 
   if (!aosd->shown)
+  {
     aosd_show(aosd);
+    aosd_loop_once(aosd);
+  }
 
   if (fade_in_ms != 0 && aosd->shown)
   {
@@ -193,9 +196,10 @@ aosd_flash(Aosd* aosd,
     }
   }
 
+  flash.alpha = 1.0;
+
   if (full_ms != 0 && aosd->shown)
   {
-    flash.alpha = 1.0;
     aosd_render(aosd);
     aosd_loop_for(aosd, full_ms);
   }
