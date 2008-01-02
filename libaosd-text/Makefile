@@ -10,4 +10,4 @@ include ../extra.mk
 
 CPPFLAGS += ${LIB_CPPFLAGS} ${PANGOCAIRO_CFLAGS} -I..
 CFLAGS += ${LIB_CFLAGS}
-LIBS += ${PANGOCAIRO_LIBS}
+LIBS += ${PANGOCAIRO_LIBS} -L../libaosd -laosd

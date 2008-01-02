@@ -291,4 +291,26 @@ aosd_text_get_size(TextRenderData* trd, unsigned* width, unsigned* height)
   }
 }
 
+int
+aosd_text_get_screen_wrap_width(Aosd* aosd, TextRenderData* trd)
+{
+  if (aosd == NULL)
+    return -1;
+
+  int width;
+
+  aosd_get_screen_size(aosd, &width, NULL);
+
+  if (trd != NULL)
+  {
+    width -= 2 * trd->geom.x_offset;
+
+    if (trd->shadow.opacity != 0 && trd->fore.opacity != 0 &&
+        (trd->shadow.x_offset != 0 || trd->shadow.y_offset != 0))
+      width -= abs(trd->shadow.x_offset);
+  }
+
+  return width * PANGO_SCALE;
+}
+
 /* vim: set ts=2 sw=2 et : */

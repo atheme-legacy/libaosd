@@ -6,6 +6,6 @@ includedir=@includedir@
 Name: libaosd-text
 Description: Convenient Pango wrappers and text renderer implementation
 Version: @PACKAGE_VERSION@
-Requires: pangocairo
+Requires: pangocairo libaosd
 Libs: -L${libdir} -laosd-text
 Cflags: -I${includedir}/libaosd
