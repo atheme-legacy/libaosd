@@ -59,7 +59,7 @@ typedef struct
   } fore;
 } TextRenderData;
 
-void aosd_text_renderer(cairo_t* cr, TextRenderData* data);
+void aosd_text_renderer(cairo_t* cr, void* TextRenderData_ptr);
 
 #ifdef __cplusplus
 }

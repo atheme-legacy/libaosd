@@ -164,8 +164,12 @@ filter_for_fg(PangoAttribute* attr, gpointer data)
 }
 
 void
-aosd_text_renderer(cairo_t* cr, TextRenderData* data)
+aosd_text_renderer(cairo_t* cr, void* TextRenderData_ptr)
 {
+  if (cr == NULL || TextRenderData_ptr == NULL)
+    return;
+
+  TextRenderData* data = TextRenderData_ptr;
   PangoLayout* lay = NULL;
   PangoAttrList* attrs = pango_layout_get_attributes(data->lay);
   PangoAttrList* new_attrs = NULL;
