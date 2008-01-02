@@ -5,7 +5,7 @@
 
 #include <cairo/cairo.h>
 
-#include <libaosd/aosd.h>
+#include <aosd.h>
 
 Bool clicked = False;
 

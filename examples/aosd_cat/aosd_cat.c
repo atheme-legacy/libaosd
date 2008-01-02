@@ -13,7 +13,7 @@
 
 #include <sys/time.h>
 
-#include <libaosd/aosd.h>
+#include <aosd.h>
 
 #include <pango/pangocairo.h>
 

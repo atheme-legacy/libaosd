@@ -6,7 +6,7 @@
 #ifndef __AOSD_TEXT_H__
 #define __AOSD_TEXT_H__
 
-#include <libaosd/aosd.h>
+#include <aosd.h>
 
 #include "pango/pangocairo.h"
 

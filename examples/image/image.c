@@ -5,7 +5,7 @@
 
 #include <glib.h>
 
-#include <libaosd/aosd.h>
+#include <aosd.h>
 
 #define MARGIN 10
 #define RADIUS 20

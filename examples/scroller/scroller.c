@@ -5,7 +5,7 @@
 
 #include <string.h>
 
-#include <libaosd/aosd-text.h>
+#include <aosd-text.h>
 
 static struct
 {
