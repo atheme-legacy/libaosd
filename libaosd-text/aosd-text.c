@@ -272,4 +272,23 @@ aosd_text_renderer(cairo_t* cr, void* TextRenderData_ptr)
   }
 }
 
+void
+aosd_text_get_size(TextRenderData* trd, unsigned* width, unsigned* height)
+{
+  if (trd == NULL || trd->lay == NULL)
+    return;
+
+  pango_layout_get_size_aosd(trd->lay, width, height, &trd->lbearing);
+
+  *width += 2 * trd->geom.x_offset;
+  *height += 2 * trd->geom.y_offset;
+
+  if (trd->shadow.opacity != 0 && trd->fore.opacity != 0 &&
+      (trd->shadow.x_offset != 0 || trd->shadow.y_offset != 0))
+  {
+    *width += abs(trd->shadow.x_offset);
+    *height += abs(trd->shadow.y_offset);
+  }
+}
+
 /* vim: set ts=2 sw=2 et : */
