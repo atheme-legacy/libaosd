@@ -224,6 +224,9 @@ aosd_flash(Aosd* aosd,
   aosd_set_renderer(aosd,
       flash.user_render.render_cb,
       flash.user_render.data);
+
+  /* free some resources */
+  cairo_surface_destroy(flash.surface);
 }
 
 /* vim: set ts=2 sw=2 et : */
