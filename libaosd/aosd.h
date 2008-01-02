@@ -15,6 +15,11 @@
 
 #include <cairo/cairo.h>
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 /* global object type */
 typedef struct _Aosd Aosd;
 
@@ -90,6 +95,10 @@ void aosd_loop_for(Aosd* aosd, unsigned loop_ms);
 /* automatic object manipulator */
 void aosd_flash(Aosd* aosd, unsigned fade_in_ms,
     unsigned full_ms, unsigned fade_out_ms);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __AOSD_H__ */
 

@@ -8,6 +8,11 @@
 
 #include "pango/pangocairo.h"
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 // Tiny Pango API augmentation
 // Way more convenient for aosd.
 PangoLayout* pango_layout_new_aosd(void);
@@ -55,6 +60,10 @@ typedef struct
 } TextRenderData;
 
 void aosd_text_renderer(cairo_t* cr, TextRenderData* data);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __AOSD_TEXT_H__ */
 
