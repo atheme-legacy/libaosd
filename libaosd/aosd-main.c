@@ -28,13 +28,13 @@ aosd_loop_iteration(Aosd* aosd)
   XNextEvent(dsp, &ev);
 
   /* smash multiple configure/exposes into one. */
-  if (ev.type == ConfigureNotify)
+  if (ev.type == ConfigureNotify ||
+      ev.type == Expose)
   {
     while (XPending(dsp))
     {
       XPeekEvent(dsp, &pev);
-      if (pev.type != ConfigureNotify &&
-          pev.type != Expose)
+      if (pev.type != ev.type)
         break;
       XNextEvent(dsp, &ev);
     }
