@@ -350,7 +350,7 @@ aosd_render(Aosd* aosd)
 void
 aosd_show(Aosd* aosd)
 {
-  if (aosd == NULL)
+  if (aosd == NULL || aosd->shown)
     return;
 
   if (aosd->mode == TRANSPARENCY_FAKE)
@@ -372,7 +372,7 @@ aosd_show(Aosd* aosd)
 void
 aosd_hide(Aosd* aosd)
 {
-  if (aosd == NULL)
+  if (aosd == NULL || !aosd->shown)
     return;
 
   XUnmapWindow(aosd->display, aosd->win);
