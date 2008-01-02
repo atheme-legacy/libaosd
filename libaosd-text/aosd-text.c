@@ -310,6 +310,9 @@ aosd_text_get_screen_wrap_width(Aosd* aosd, TextRenderData* trd)
       width -= abs(trd->shadow.x_offset);
   }
 
+  if (width <= 0)
+    return -1;
+
   return width * PANGO_SCALE;
 }
 
