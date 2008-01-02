@@ -208,9 +208,15 @@ aosd_text_renderer(cairo_t* cr, void* TextRenderData_ptr)
         col.blue    / (double)65535,
         data->shadow.opacity / (double)255);
 
-    cairo_move_to(cr,
-        data->geom.x_offset + data->shadow.x_offset + data->lbearing,
-        data->geom.y_offset + data->shadow.y_offset);
+    int x = data->geom.x_offset + data->lbearing;
+    int y = data->geom.y_offset;
+    if (data->fore.opacity != 0)
+    {
+      x += (data->shadow.x_offset > 0 ? data->shadow.x_offset : 0);
+      y += (data->shadow.y_offset > 0 ? data->shadow.y_offset : 0);
+    }
+    cairo_move_to(cr, x, y);
+
     pango_cairo_show_layout(cr, lay);
 
     if (new_attrs != NULL)
@@ -243,9 +249,16 @@ aosd_text_renderer(cairo_t* cr, void* TextRenderData_ptr)
         col.blue  / (double)65535,
         data->fore.opacity / (double)255);
 
-    cairo_move_to(cr,
-        data->geom.x_offset + data->lbearing,
-        data->geom.y_offset);
+    int x = data->geom.x_offset + data->lbearing;
+    int y = data->geom.y_offset;
+    if (data->shadow.opacity != 0 &&
+        (data->shadow.x_offset != 0 || data->shadow.y_offset != 0))
+    {
+      x += (data->shadow.x_offset < 0 ? -data->shadow.x_offset : 0);
+      y += (data->shadow.y_offset < 0 ? -data->shadow.y_offset : 0);
+    }
+    cairo_move_to(cr, x, y);
+
     pango_cairo_show_layout(cr, lay);
 
     if (new_attrs != NULL)
