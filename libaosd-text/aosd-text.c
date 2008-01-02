@@ -35,13 +35,12 @@ pango_layout_get_size_aosd(PangoLayout* lay,
     return;
 
   PangoRectangle ink;
-  PangoRectangle log;
-  pango_layout_get_pixel_extents(lay, &ink, &log);
+  pango_layout_get_pixel_extents(lay, &ink, NULL);
 
   if (width != NULL)
     *width = ink.width;
   if (height != NULL)
-    *height = PANGO_DESCENT(log);
+    *height = PANGO_DESCENT(ink);
   if (lbearing != NULL)
     *lbearing = -ink.x;
 }
