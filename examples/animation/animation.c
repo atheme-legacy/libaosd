@@ -3,11 +3,7 @@
  * Copyright (C) 2006 Evan Martin <martine@danga.com>
  */
 
-#include <cairo/cairo.h>
-
 #include <aosd.h>
-
-Bool clicked = False;
 
 typedef struct {
   cairo_surface_t* foot;
@@ -53,12 +49,6 @@ render(cairo_t* cr, void* data)
   cairo_restore(cr);
 }
 
-static void
-mouse_callback(AosdMouseEvent* event, void* user_data)
-{
-  clicked = True;
-}
-
 int main(int argc, char* argv[])
 {
   Aosd* aosd;
@@ -70,7 +60,7 @@ int main(int argc, char* argv[])
 
   aosd = aosd_new();
   aosd_set_transparency(aosd, TRANSPARENCY_COMPOSITE);
-  aosd_set_mouse_event_cb(aosd, mouse_callback, NULL);
+  aosd_set_hide_upon_mouse_event(aosd, True);
   aosd_set_geometry(aosd, 50, 50, 180, 230);
   aosd_set_renderer(aosd, render, &data);
 
@@ -96,7 +86,7 @@ int main(int argc, char* argv[])
 
     aosd_render(aosd);
     aosd_loop_for(aosd, 100);
-  } while (!clicked);
+  } while (aosd_get_is_shown(aosd));
 
   cairo_surface_destroy(data.foot);
   aosd_destroy(aosd);
