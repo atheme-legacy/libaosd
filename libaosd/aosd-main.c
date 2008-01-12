@@ -84,6 +84,8 @@ aosd_loop_once(Aosd* aosd)
   if (aosd == NULL)
     return;
 
+  XSync(aosd->display, False);
+
   while (XPending(aosd->display))
     aosd_loop_iteration(aosd);
 }
