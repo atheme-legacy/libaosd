@@ -88,7 +88,16 @@ AC_ARG_ENABLE(glib,
 
 if test "$enable_glib" = "yes"; then
     PKG_CHECK_MODULES(GLIB, glib-2.0,
-	[EXAMPLES+=" image"], [enable_glib="no"])
+	[
+	 EXAMPLES+=" image"
+	 if test "$enable_pangocairo" = "yes"; then
+	     EXAMPLES+=" aosd_cat2"
+	 fi
+	],
+	[
+	 enable_glib="no"
+	]
+    )
 else
     enable_glib="no"
 fi
