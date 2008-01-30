@@ -68,7 +68,7 @@ AC_ARG_ENABLE(pangocairo,
 if test "$enable_pangocairo" = "yes"; then
     PKG_CHECK_MODULES(PANGOCAIRO, pangocairo,
 	[
-	 EXAMPLES+=" aosd_cat scroller"
+	 EXAMPLES+=" scroller"
 	 TEXT_DIR="libaosd-text"
 	 TEXT_PKGCONF="libaosd-text.pc"
 	],
@@ -91,7 +91,7 @@ if test "$enable_glib" = "yes"; then
 	[
 	 EXAMPLES+=" image"
 	 if test "$enable_pangocairo" = "yes"; then
-	     EXAMPLES+=" aosd_cat2"
+	     EXAMPLES+=" aosd_cat"
 	 fi
 	],
 	[
