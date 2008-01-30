@@ -1,6 +1,6 @@
 AC_PREREQ(2.54)
 
-AC_INIT([libaosd], [0.2.4], [http://bugzilla.atheme.org/])
+AC_INIT([libaosd], [0.2.5], [http://bugzilla.atheme.org/])
 AC_CONFIG_HEADER([config.h])
 
 AC_CANONICAL_HOST
