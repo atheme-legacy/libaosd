@@ -364,8 +364,8 @@ resize_and_show(void)
 {
   aosd_text_get_size(data.rend, &data.width, &data.height);
   aosd_set_position_with_offset(data.aosd,
-      config.position / 3, config.position % 3,
-      config.x_offset, config.y_offset, data.width, data.height);
+      config.position % 3, config.position / 3,
+      data.width, data.height, config.x_offset, config.y_offset);
 
   aosd_flash(data.aosd, config.fade_in, config.fade_full, config.fade_out);
 }
