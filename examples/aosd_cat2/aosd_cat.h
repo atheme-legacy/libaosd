@@ -81,7 +81,7 @@ static struct Configuration
   "-"
 };
 
-static struct
+static struct Globals
 {
   Aosd* aosd;
   TextRenderData* rend;
