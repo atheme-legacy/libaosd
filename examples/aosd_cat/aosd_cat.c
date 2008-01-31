@@ -153,8 +153,8 @@ parse_options(int* argc, char** argv[])
       "  or will not be wrapped at all if other parameters make it impossible to\n"
       "  layout correctly.\n"
       "\n"
-      "Thank you for using libaosd!\n"
-      "Please send bug reports to: http://bugzilla.atheme.org/");
+      "Thank you for using " PACKAGE_NAME "!\n"
+      "Please send bug reports to: " PACKAGE_BUGREPORT);
 
   /* Fill context option groups */
 #define ADD_GROUP(name, desc) \
