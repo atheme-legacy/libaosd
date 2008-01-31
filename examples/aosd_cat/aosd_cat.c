@@ -278,10 +278,6 @@ setup(void)
 static void
 clean_queue(void)
 {
-  if (config.age == 0 &&
-      config.lines == 0)
-    return;
-
   if (config.lines != 0)
     while (g_queue_get_length(data.list) > config.lines)
       KILL_FIRST;
