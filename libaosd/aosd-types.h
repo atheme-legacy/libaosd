@@ -32,17 +32,17 @@ typedef struct
   pthread_cond_t cond;
 } LockPair;
 
-#define UMODE(mode) (1 << mode)
-
 typedef enum
 {
   UP_NONE = 0,
-  UP_HIDE,
-  UP_SHOW,
-  UP_SIZE,
-  UP_POS,
-  UP_REND,
-  UP_TIME
+  UP_HIDE = 1 << 1,
+  UP_SHOW = 1 << 2,
+  UP_SIZE = 1 << 3,
+  UP_POS  = 1 << 4,
+  UP_REND = 1 << 5,
+  UP_TIME = 1 << 6,
+
+  UP_FINISH = 1 << 15
 } UpdateMode;
 
 struct _Aosd
