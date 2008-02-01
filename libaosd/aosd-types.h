@@ -45,6 +45,7 @@ struct _Aosd
   Window root_win;
   Window win;
   int x, y, width, height;
+  Colormap colormap;
   XRenderPictFormat* xrformat;
 
   AosdBackground background;
