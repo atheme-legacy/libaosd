@@ -1,8 +1,3 @@
-/* aosd -- OSD with transparency and cairo.
- *
- * Copyright (C) 2008 Eugene Paskevich <eugene@raptor.kiev.ua>
- */
-
 #include "config.h"
 
 void make_window(Aosd*);

@@ -1,8 +1,3 @@
-/* aosd -- OSD with transparency, cairo, and pango.
- *
- * Copyright (C) 2008 Eugene Paskevich <eugene@raptor.kiev.ua>
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

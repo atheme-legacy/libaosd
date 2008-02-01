@@ -1,5 +1,3 @@
-/* Copyright (C) 2006 Evan Martin <martine@danga.com> */
-
 #include <stdio.h>
 #include <stdlib.h>
 

@@ -1,8 +1,3 @@
-/* aosd -- OSD with transparency, cairo, and pango.
- *
- * Copyright (C) 2008 Eugene Paskevich <eugene@raptor.kiev.ua>
- */
-
 #define DEBUG(fmt, ...) \
   fprintf(stderr, fmt "\n",## __VA_ARGS__)
 
