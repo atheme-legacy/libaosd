@@ -46,8 +46,8 @@ setup(void)
 {
   data.aosd = aosd_new();
   aosd_set_renderer(data.aosd, aosd_text_renderer, &data.rend);
-  aosd_set_transparency(data.aosd, TRANSPARENCY_COMPOSITE);
-  if (aosd_get_transparency(data.aosd) != TRANSPARENCY_COMPOSITE)
+/*  aosd_set_transparency(data.aosd, TRANSPARENCY_COMPOSITE);
+  if (aosd_get_transparency(data.aosd) != TRANSPARENCY_COMPOSITE)*/
     aosd_set_transparency(data.aosd, TRANSPARENCY_NONE);
 
   data.rend.geom.x_offset = 10;
