@@ -35,12 +35,6 @@ make_window(Aosd* aosd)
     aosd->background.set = False;
   }
 
-  if (aosd->colormap != None)
-  {
-    XFreeColormap(dsp, aosd->colormap);
-    aosd->colormap = None;
-  }
-
   if (aosd->win != None)
   {
     XDestroyWindow(dsp, aosd->win);
@@ -57,8 +51,9 @@ make_window(Aosd* aosd)
   att.background_pixel = 0x0;
   att.background_pixmap = None;
   att.border_pixel = 0;
-  att.event_mask = ExposureMask | StructureNotifyMask | ButtonPressMask;
+  att.colormap = None;
   att.save_under = True;
+  att.event_mask = ExposureMask | StructureNotifyMask | ButtonPressMask;
   att.override_redirect = True;
 
   unsigned long value_mask = CWBackingStore | CWBackPixel | CWBackPixmap |
@@ -74,8 +69,7 @@ make_window(Aosd* aosd)
     if (composite_check_ext_and_mgr(dsp, scr) &&
         (visual = composite_find_argb_visual(dsp, scr)) != NULL)
     {
-      aosd->colormap = att.colormap =
-        XCreateColormap(dsp, root_win, visual, AllocNone);
+      att.colormap = XCreateColormap(dsp, root_win, visual, AllocNone);
       aosd->win = WIN(32, visual, CWColormap);
     }
     else
