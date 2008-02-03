@@ -1,3 +1,13 @@
+/* aosd -- OSD with transparency, cairo, and pango.
+ *
+ * Copyright (C) 2006 Evan Martin <martine@danga.com>
+ *
+ * With further development by Giacomo Lozito <james@develia.org>
+ * - added real transparency with X Composite Extension
+ * - added mouse event handling on OSD window
+ * - added/changed some other stuff
+ */
+
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -6,7 +16,9 @@
 #include <sys/poll.h>
 #include <sys/time.h>
 
-#include "aosd-types.h"
+#include <X11/Xlib.h>
+
+#include "aosd-internal.h"
 
 static void
 aosd_loop_iteration(Aosd* aosd)

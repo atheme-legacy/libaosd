@@ -1,17 +1,25 @@
+/* aosd -- OSD with transparency, cairo, and pango.
+ *
+ * Copyright (C) 2006 Evan Martin <martine@danga.com>
+ *
+ * With further development by Giacomo Lozito <james@develia.org>
+ * - added real transparency with X Composite Extension
+ * - added mouse event handling on OSD window
+ * - added/changed some other stuff
+ */
+
 #include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 #include <cairo/cairo-xlib-xrender.h>
 
+#include <X11/Xlib.h>
 #include <X11/Xatom.h>
 
-#include "aosd-types.h"
 #include "aosd-internal.h"
-#include "aosd-thread.h"
 
 Aosd*
 aosd_new(void)
@@ -20,47 +28,22 @@ aosd_new(void)
   Display* dsp = XOpenDisplay(NULL);
 
   if (dsp == NULL)
-  {
     fprintf(stderr, "libaosd: Couldn't open the display.\n");
-    goto bailout;
+  else
+  {
+    int screen_num = DefaultScreen(dsp);
+    Window root_win = DefaultRootWindow(dsp);
+
+    aosd = calloc(1, sizeof(Aosd));
+    aosd->display = dsp;
+    aosd->screen_num = screen_num;
+    aosd->root_win = root_win;
+    aosd->mode = TRANSPARENCY_NONE;
+
+    make_window(aosd);
+    aosd_set_name(aosd, NULL);
   }
 
-  int screen_num = DefaultScreen(dsp);
-  Window root_win = DefaultRootWindow(dsp);
-
-  aosd = calloc(1, sizeof(Aosd));
-  aosd->display = dsp;
-  aosd->screen_num = screen_num;
-  aosd->root_win = root_win;
-  aosd->mode = TRANSPARENCY_NONE;
-
-  if (!init_lock_pair(&aosd->lock_main))
-    goto kill_aosd;
-  if (!init_lock_pair(&aosd->lock_time))
-    goto kill_main_pair;
-
-  if (pipe(aosd->pipe) != 0)
-    goto kill_time_pair;
-
-  pthread_create(&aosd->main_thread, NULL, aosd_main_event_loop, aosd);
-
-  make_window(aosd);
-  aosd_set_name(aosd, NULL);
-
-  goto bailout;
-
-kill_time_pair:
-  kill_lock_pair(&aosd->lock_time);
-
-kill_main_pair:
-  kill_lock_pair(&aosd->lock_main);
-
-kill_aosd:
-  XCloseDisplay(dsp);
-  free(aosd);
-  aosd = NULL;
-
-bailout:
   return aosd;
 }
 
@@ -73,19 +56,6 @@ aosd_destroy(Aosd* aosd)
   aosd->root_win = None;
   make_window(aosd);
 
-  aosd_lock(aosd);
-  aosd->update = UP_FINISH;
-  aosd_unlock(aosd);
-
-  pthread_join(aosd->main_thread, NULL);
-
-  close(aosd->pipe[0]);
-  close(aosd->pipe[1]);
-
-  kill_lock_pair(&aosd->lock_main);
-  kill_lock_pair(&aosd->lock_update);
-  kill_lock_pair(&aosd->lock_time);
-
   XCloseDisplay(aosd->display);
   free(aosd);
 }
@@ -96,9 +66,7 @@ aosd_get_name(Aosd* aosd, XClassHint* result)
   if (aosd == NULL || result == NULL)
     return;
 
-  aosd_lock(aosd);
   XGetClassHint(aosd->display, aosd->win, result);
-  aosd_unlock(aosd);
 }
 
 void
@@ -181,9 +149,7 @@ aosd_set_name(Aosd* aosd, XClassHint* name)
     flag = True;
   }
 
-  aosd_lock(aosd);
   XSetClassHint(aosd->display, aosd->win, name);
-  aosd_unlock(aosd);
 
   if (flag)
     XFree(name);
@@ -324,34 +290,47 @@ aosd_render(Aosd* aosd)
 
   Display* dsp = aosd->display;
   int scr = aosd->screen_num;
-  unsigned width = aosd->width, height = aosd->height;
-  unsigned depth =
-    aosd->mode == TRANSPARENCY_COMPOSITE ? 32 : DefaultDepth(dsp, scr);
+  int width = aosd->width, height = aosd->height;
   Window win = aosd->win;
-  Pixmap pixmap = XCreatePixmap(dsp, win, width, height, depth);
-  GC gc = XCreateGC(dsp, pixmap, 0, NULL);
+  Pixmap pixmap;
+  GC gc;
 
-  /* copy our background if needed */
-  if (aosd->mode == TRANSPARENCY_FAKE &&
-      aosd->background.set)
-    XCopyArea(dsp, aosd->background.pixmap, pixmap, gc,
-        0, 0, width, height, 0, 0);
-  else
+  if (aosd->mode == TRANSPARENCY_COMPOSITE)
+  {
+    pixmap = XCreatePixmap(dsp, win, width, height, 32);
+    gc = XCreateGC(dsp, pixmap, 0, NULL);
     XFillRectangle(dsp, pixmap, gc, 0, 0, width, height);
-  
+  }
+  else
+  {
+    pixmap = XCreatePixmap(dsp, win, width, height, DefaultDepth(dsp, scr));
+    gc = XCreateGC(dsp, pixmap, 0, NULL);
+    if (aosd->mode == TRANSPARENCY_FAKE)
+      /* make our own copy of the background pixmap as the initial surface */
+      XCopyArea(dsp, aosd->background.pixmap, pixmap, gc,
+          0, 0, width, height, 0, 0);
+    else
+      XFillRectangle(dsp, pixmap, gc, 0, 0, width, height);
+  }
   XFreeGC(dsp, gc);
 
   /* render with cairo */
   if (aosd->renderer.render_cb)
   {
     /* create cairo surface using the pixmap */
-    cairo_surface_t* surf = cairo_xlib_surface_create_with_xrender_format(
-        dsp, pixmap, ScreenOfDisplay(dsp, scr), aosd->xrformat, width, height);
-    cairo_t* cr = cairo_create(surf);
+    XRenderPictFormat* xrformat;
+    cairo_surface_t* surf;
+    if (aosd->mode == TRANSPARENCY_COMPOSITE)
+      xrformat = XRenderFindVisualFormat(dsp, aosd->visual);
+    else
+      xrformat = XRenderFindVisualFormat(dsp, DefaultVisual(dsp, scr));
+
+    surf = cairo_xlib_surface_create_with_xrender_format(
+        dsp, pixmap, ScreenOfDisplay(dsp, scr), xrformat, width, height);
 
     /* draw some stuff */
+    cairo_t* cr = cairo_create(surf);
     aosd->renderer.render_cb(cr, aosd->renderer.data);
-
     cairo_destroy(cr);
     cairo_surface_destroy(surf);
   }
@@ -396,9 +375,8 @@ aosd_hide(Aosd* aosd)
   if (aosd == NULL || !aosd->shown)
     return;
 
-  aosd_lock(aosd);
-  aosd->update |= UP_HIDE;
-  aosd_unlock(aosd);
+  XUnmapWindow(aosd->display, aosd->win);
+  aosd->shown = False;
 }
 
 /* vim: set ts=2 sw=2 et : */

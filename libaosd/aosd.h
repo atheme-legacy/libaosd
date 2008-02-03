@@ -1,3 +1,13 @@
+/* aosd -- OSD with transparency, cairo, and pango.
+ *
+ * Copyright (C) 2006 Evan Martin <martine@danga.com>
+ *
+ * With further development by Giacomo Lozito <james@develia.org>
+ * - added real transparency with X Composite Extension
+ * - added mouse event handling on OSD window
+ * - added/changed some other stuff
+ */
+
 #ifndef __AOSD_H__
 #define __AOSD_H__
 

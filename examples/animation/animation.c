@@ -1,3 +1,8 @@
+/* aosd -- OSD with fake transparency, cairo, and pango.
+ *
+ * Copyright (C) 2006 Evan Martin <martine@danga.com>
+ */
+
 #include <aosd.h>
 
 typedef struct {
