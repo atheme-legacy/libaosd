@@ -13,4 +13,4 @@ include ../extra.mk
 
 CPPFLAGS += ${LIB_CPPFLAGS} ${X_CFLAGS} ${CAIRO_CFLAGS} -I..
 CFLAGS += ${LIB_CFLAGS}
-LIBS += ${X_LIBS} ${CAIRO_LIBS} -lpthread
+LIBS += ${X_LIBS} ${CAIRO_LIBS}

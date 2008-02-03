@@ -16,7 +16,9 @@
 #include <sys/poll.h>
 #include <sys/time.h>
 
-#include "aosd-types.h"
+#include <X11/Xlib.h>
+
+#include "aosd-internal.h"
 
 static void
 aosd_loop_iteration(Aosd* aosd)

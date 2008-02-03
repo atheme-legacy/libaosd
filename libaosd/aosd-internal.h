@@ -1,15 +1,58 @@
-/* aosd -- OSD with transparency and cairo.
+/* aosd -- OSD with transparency, cairo, and pango.
  *
- * Copyright (C) 2008 Eugene Paskevich <eugene@raptor.kiev.ua>
+ * Copyright (C) 2006 Evan Martin <martine@danga.com>
+ *
+ * With further development by Giacomo Lozito <james@develia.org>
+ * - added real transparency with X Composite Extension
+ * - added mouse event handling on OSD window
+ * - added/changed some other stuff
  */
 
 #include "config.h"
 
+#include "aosd.h"
+
+typedef struct
+{
+  AosdRenderer render_cb;
+  void* data;
+} RenderCallback;
+
+typedef struct
+{
+  AosdMouseEventCb mouse_event_cb;
+  void* data;
+} MouseEventCallback;
+
+typedef struct
+{
+  Pixmap pixmap;
+  Bool set;
+} AosdBackground;
+
+struct _Aosd
+{
+  Display* display;
+  int screen_num;
+  unsigned int depth;
+  Window root_win;
+  Window win;
+  Visual* visual;
+  Colormap colormap;
+  int x, y, width, height;
+
+  AosdBackground background;
+  RenderCallback renderer;
+  AosdTransparency mode;
+  MouseEventCallback mouse_processor;
+
+  Bool mouse_hide;
+  Bool shown;
+};
+
 void make_window(Aosd*);
 void set_window_properties(Display*, Window);
 Pixmap take_snapshot(Aosd*);
-Bool init_lock_pair(LockPair* pair);
-void kill_lock_pair(LockPair* pair);
 
 #ifdef HAVE_XCOMPOSITE
 Bool composite_check_ext_and_mgr(Display*, int);
