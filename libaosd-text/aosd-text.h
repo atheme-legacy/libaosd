@@ -1,3 +1,8 @@
+/* aosd -- OSD with transparency, cairo, and pango.
+ *
+ * Copyright (C) 2007 Eugene Paskevich <eugene@raptor.kiev.ua>
+ */
+
 #ifndef __AOSD_TEXT_H__
 #define __AOSD_TEXT_H__
 

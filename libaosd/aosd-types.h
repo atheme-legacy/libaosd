@@ -1,3 +1,8 @@
+/* aosd -- OSD with transparency and cairo.
+ *
+ * Copyright (C) 2008 Eugene Paskevich <eugene@raptor.kiev.ua>
+ */
+
 #ifndef __AOSD_TYPES_H__
 #define __AOSD_TYPES_H__
 
