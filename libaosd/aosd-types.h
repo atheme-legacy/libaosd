@@ -36,36 +36,14 @@ typedef enum
 {
   UP_NONE = 0,
   UP_HIDE = 1 << 1,
-  UP_SIZE = 1 << 2,
-  UP_POS  = 1 << 3,
-  UP_REND = 1 << 4,
-  UP_SHOW = 1 << 5,
+  UP_SHOW = 1 << 2,
+  UP_SIZE = 1 << 3,
+  UP_POS  = 1 << 4,
+  UP_REND = 1 << 5,
   UP_TIME = 1 << 6,
 
   UP_FINISH = 1 << 15
-} UpdateTask;
-
-typedef enum
-{
-  FLASH_OFF = 0,
-  FLASH_START,
-  FLASH_FADEIN,
-  FLASH_FADEFULL,
-  FLASH_FADEOUT,
-  FLASH_HIDE,
-  FLASH_STOP
-} FlashMode;
-
-typedef struct
-{
-  FlashMode mode;
-  unsigned int fade_in;
-  unsigned int fade_full;
-  unsigned int fade_out;
-  cairo_surface_t* surf;
-} FlashData;
-
-typedef struct timeval Timer;
+} UpdateMode;
 
 struct _Aosd
 {
@@ -87,10 +65,10 @@ struct _Aosd
 
   pthread_t main_thread;
   LockPair lock_main;
-  LockPair lock_time;
+  LockPair lock_update;
   int pipe[2];
 
-  Timer start;
+  struct timeval timeout_start;
   unsigned int delta_time;
 
   Bool mouse_hide;

@@ -11,7 +11,6 @@
 
 #include "aosd-types.h"
 #include "aosd-internal.h"
-#include "aosd-thread.h"
 
 Aosd*
 aosd_new(void)
@@ -36,21 +35,19 @@ aosd_new(void)
 
   if (!init_lock_pair(&aosd->lock_main))
     goto kill_aosd;
-  if (!init_lock_pair(&aosd->lock_time))
+  if (!init_lock_pair(&aosd->lock_update))
     goto kill_main_pair;
 
   if (pipe(aosd->pipe) != 0)
-    goto kill_time_pair;
-
-  pthread_create(&aosd->main_thread, NULL, aosd_main_event_loop, aosd);
+    goto kill_update_pair;
 
   make_window(aosd);
   aosd_set_name(aosd, NULL);
 
   goto bailout;
 
-kill_time_pair:
-  kill_lock_pair(&aosd->lock_time);
+kill_update_pair:
+  kill_lock_pair(&aosd->lock_update);
 
 kill_main_pair:
   kill_lock_pair(&aosd->lock_main);
@@ -73,18 +70,11 @@ aosd_destroy(Aosd* aosd)
   aosd->root_win = None;
   make_window(aosd);
 
-  aosd_lock(aosd);
-  aosd->update = UP_FINISH;
-  aosd_unlock(aosd);
-
-  pthread_join(aosd->main_thread, NULL);
-
   close(aosd->pipe[0]);
   close(aosd->pipe[1]);
 
   kill_lock_pair(&aosd->lock_main);
   kill_lock_pair(&aosd->lock_update);
-  kill_lock_pair(&aosd->lock_time);
 
   XCloseDisplay(aosd->display);
   free(aosd);
@@ -96,9 +86,7 @@ aosd_get_name(Aosd* aosd, XClassHint* result)
   if (aosd == NULL || result == NULL)
     return;
 
-  aosd_lock(aosd);
   XGetClassHint(aosd->display, aosd->win, result);
-  aosd_unlock(aosd);
 }
 
 void
@@ -181,9 +169,7 @@ aosd_set_name(Aosd* aosd, XClassHint* name)
     flag = True;
   }
 
-  aosd_lock(aosd);
   XSetClassHint(aosd->display, aosd->win, name);
-  aosd_unlock(aosd);
 
   if (flag)
     XFree(name);
@@ -396,9 +382,8 @@ aosd_hide(Aosd* aosd)
   if (aosd == NULL || !aosd->shown)
     return;
 
-  aosd_lock(aosd);
-  aosd->update |= UP_HIDE;
-  aosd_unlock(aosd);
+  XUnmapWindow(aosd->display, aosd->win);
+  aosd->shown = False;
 }
 
 /* vim: set ts=2 sw=2 et : */
