@@ -1,0 +1,61 @@
+.TH AOSD "1" "November 2007" "aosd_cat" "User Commands"
+.SH NAME
+aosd_cat \- displays text on the screen
+.SH SYNOPSIS
+.B aosd_cat
+[\fIOPTION\fR] [\fITEXT\fR]...
+.SH DESCRIPTION
+Display TEXT, or standard input, on top of display.
+.HP
+\fB\-F\fR, \fB\-\-fontdesc\fR=\fIFONT\fR Use font description (default: "Trebuchet 30")
+.TP
+\fB\-r\fR, \fB\-\-red\fR=\fILEVEL\fR
+Red level, default is 0.00
+.TP
+\fB\-g\fR, \fB\-\-green\fR=\fILEVEL\fR
+Green level, default is 1.00
+.TP
+\fB\-b\fR, \fB\-\-blue\fR=\fILEVEL\fR
+Blue level, default is 0.00
+.TP
+\fB\-a\fR, \fB\-\-alpha\fR=\fILEVEL\fR
+Alpha level, default is 1.00
+.TP
+\fB\-x\fR, \fB\-\-xpos\fR=\fIOFFSET\fR
+X\-position on screen, default is \fB\-50\fR
+.TP
+\fB\-y\fR, \fB\-\-ypos\fR=\fIOFFSET\fR
+Y\-position on screen, default is \fB\-50\fR
+.TP
+\fB\-d\fR, \fB\-\-delay\fR=\fITIME\fR
+Show for specified time (milliseconds), default is 1500
+.TP
+\fB\-e\fR, \fB\-\-fade\fR=\fITIME\fR
+Time to spend fading, default is 300
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Show this help
+.HP
+\fB\-s\fR, \fB\-\-shadow\fR=\fISHADOW\fR Offset of shadow, default is 2 (0 is no shadow)
+.TP
+\fB\-S\fR, \fB\-\-shadowalpha\fR=\fIlevel\fR
+Alpha level of shadow, default is 0.50
+.TP
+\fB\-f\fR, \fB\-\-file\fR[=\fIFILE\fR]
+Read from file rather than command line (use \- or omit FILE for stdin)
+.TP
+\fB\-t\fR, \fB\-\-text\fR[=\fITEXT\fR]
+Display TEXT (or omit TEXT for example text)
+.TP
+\fB\-m\fR, \fB\-\-maxlen\fR=\fILEN\fR
+Maximum length of any line displayed when \fB\-t\fR not specified, default is 55
+.TP
+\fB\-l\fR, \fB\-\-lines\fR=\fIn\fR
+Scroll using n lines. Default is 1.
+.TP
+\fB\-G\fR, \fB\-\-age\fR=\fITIME\fR
+Time in milliseconds before old scroll lines are discarded,
+use 0 to ignore, default is 0
+(Note that at most min{AGE/DELAY, LINES} will ever be shown at once)
+.SH BUGS
+This manpage may be out of date. Use \-\-help to get the latest options.
