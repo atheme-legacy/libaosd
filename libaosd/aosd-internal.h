@@ -16,7 +16,6 @@ typedef struct
 {
   AosdRenderer render_cb;
   void* data;
-  void (*data_destroyer)(void*);
 } RenderCallback;
 
 typedef struct
@@ -28,7 +27,7 @@ typedef struct
 typedef struct
 {
   Pixmap pixmap;
-  int set;
+  Bool set;
 } AosdBackground;
 
 struct _Aosd
@@ -46,6 +45,9 @@ struct _Aosd
   RenderCallback renderer;
   AosdTransparency mode;
   MouseEventCallback mouse_processor;
+
+  Bool mouse_hide;
+  Bool shown;
 };
 
 void make_window(Aosd*);

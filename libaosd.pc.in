@@ -4,8 +4,8 @@ libdir=@libdir@
 includedir=@includedir@
 
 Name: libaosd
-Description: An Atheme fork of ghosd with X composite transparency
+Description: An Atheme OSD framework with Cairo and XComposite transparency
 Version: @PACKAGE_VERSION@
 Requires: @PACKAGES@
 Libs: -L${libdir} -laosd
-Cflags: -I${includedir}/aosd
+Cflags: -I${includedir}/libaosd

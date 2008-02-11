@@ -3,14 +3,7 @@
  * Copyright (C) 2006 Evan Martin <martine@danga.com>
  */
 
-#include <stdio.h>
-#include <sys/time.h>
-#include <sys/poll.h>
-#include <time.h>
-
-#include <cairo/cairo.h>
-
-#include <libaosd/aosd.h>
+#include <aosd.h>
 
 typedef struct {
   cairo_surface_t* foot;
@@ -35,7 +28,7 @@ round_rect(cairo_t* cr, int x, int y, int w, int h, int r)
 #define RADIUS 40
 
 static void
-render(Aosd* aosd, cairo_t* cr, void* data)
+render(cairo_t* cr, void* data)
 {
   RenderData* rdata = data;
 
@@ -67,25 +60,18 @@ int main(int argc, char* argv[])
 
   aosd = aosd_new();
   aosd_set_transparency(aosd, TRANSPARENCY_COMPOSITE);
+  aosd_set_hide_upon_mouse_event(aosd, True);
   aosd_set_geometry(aosd, 50, 50, 180, 230);
-  aosd_set_renderer(aosd, render, &data, NULL);
+  aosd_set_renderer(aosd, render, &data);
 
   aosd_show(aosd);
 
-  aosd_main_iterations(aosd);
+  aosd_loop_once(aosd);
 
-  const int STEP = 100;
   float dalpha = 0.05;
 
-  struct timeval tv_nextupdate;
-
-  for (;;)
+  do
   {
-    gettimeofday(&tv_nextupdate, NULL);
-    tv_nextupdate.tv_usec += STEP * 1000;
-
-    aosd_main_until(aosd, &tv_nextupdate);
-
     data.alpha += dalpha;
     if (data.alpha >= 1.0)
     {
@@ -97,8 +83,10 @@ int main(int argc, char* argv[])
       data.alpha = 0.0;
       dalpha = -dalpha;
     }
+
     aosd_render(aosd);
-  }
+    aosd_loop_for(aosd, 100);
+  } while (aosd_get_is_shown(aosd));
 
   cairo_surface_destroy(data.foot);
   aosd_destroy(aosd);

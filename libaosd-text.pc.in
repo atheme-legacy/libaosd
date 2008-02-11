@@ -1,0 +1,11 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: libaosd-text
+Description: Convenient Pango wrappers and text renderer implementation
+Version: @PACKAGE_VERSION@
+Requires: pangocairo libaosd
+Libs: -L${libdir} -laosd-text
+Cflags: -I${includedir}/libaosd

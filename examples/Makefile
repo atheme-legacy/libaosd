@@ -1,6 +1,5 @@
-SUBDIRS = animation \
-	  aosd_cat \
-	  image \
-	  text
+include ../extra.mk
+
+SUBDIRS = ${EXAMPLES}
 
 include ../buildsys.mk

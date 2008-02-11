@@ -8,38 +8,33 @@
  * - added/changed some other stuff
  */
 
-#include "config.h"
-
 #include <stdio.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
-#include <unistd.h>
-#include <errno.h>
 
 #include <sys/poll.h>
+#include <sys/time.h>
 
 #include <X11/Xlib.h>
-
-#include <pango/pango-layout.h>
 
 #include "aosd-internal.h"
 
 static void
-aosd_main_iteration(Aosd* aosd)
+aosd_loop_iteration(Aosd* aosd)
 {
   Display* dsp = aosd->display;
   XEvent ev, pev;
   XNextEvent(dsp, &ev);
 
   /* smash multiple configure/exposes into one. */
-  if (ev.type == ConfigureNotify)
+  if (ev.type == ConfigureNotify ||
+      ev.type == Expose)
   {
     while (XPending(dsp))
     {
       XPeekEvent(dsp, &pev);
-      if (pev.type != ConfigureNotify &&
-          pev.type != Expose)
+      if (pev.type != ev.type)
         break;
       XNextEvent(dsp, &ev);
     }
@@ -53,20 +48,19 @@ aosd_main_iteration(Aosd* aosd)
     case ConfigureNotify:
       if (aosd->width > 0)
       {
-        /* XXX if the window manager disagrees with our positioning here,
-         * we loop. */
+        /* FIXME We might loop here if window manager
+         * disagrees with our positioning */
         if (aosd->x != ev.xconfigure.x ||
             aosd->y != ev.xconfigure.y)
-        {
-          // width = ev.xconfigure.width; 
-          // height = ev.xconfigure.height;
-          XMoveResizeWindow(dsp,
-              aosd->win, aosd->x, aosd->y, aosd->width, aosd->height);
-        }
+          XMoveResizeWindow(dsp, aosd->win,
+              aosd->x, aosd->y, aosd->width, aosd->height);
       }
       break;
 
     case ButtonPress:
+      if (aosd->mouse_hide)
+        aosd_hide(aosd);
+
       /* create AosdMouseEvent and pass it to callback function */
       if (aosd->mouse_processor.mouse_event_cb != NULL)
       {
@@ -78,32 +72,46 @@ aosd_main_iteration(Aosd* aosd)
         mev.button = ev.xbutton.button;
         mev.send_event = ev.xbutton.send_event;
         mev.time = ev.xbutton.time;
-        aosd->mouse_processor.mouse_event_cb(aosd, &mev, aosd->mouse_processor.data);
+        aosd->mouse_processor.mouse_event_cb(&mev, aosd->mouse_processor.data);
       }
       break;
   }
 }
 
 void
-aosd_main_iterations(Aosd* aosd)
+aosd_loop_once(Aosd* aosd)
 {
+  if (aosd == NULL)
+    return;
+
+  XSync(aosd->display, False);
+
   while (XPending(aosd->display))
-    aosd_main_iteration(aosd);
+    aosd_loop_iteration(aosd);
 }
 
 void
-aosd_main_until(Aosd* aosd, struct timeval* until)
+aosd_loop_for(Aosd* aosd, unsigned loop_ms)
 {
-  struct timeval tv_now;
+  if (aosd == NULL)
+    return;
 
-  aosd_main_iterations(aosd);
+  aosd_loop_once(aosd);
+
+  if (loop_ms == 0 || !aosd->shown)
+    return;
+
+  struct timeval tv_now;
+  struct timeval tv_until;
+  gettimeofday(&tv_until, NULL);
+  tv_until.tv_usec += loop_ms * 1000;
 
   for (;;)
   {
     gettimeofday(&tv_now, NULL);
-    int dt = (until->tv_sec  - tv_now.tv_sec ) * 1000 +
-             (until->tv_usec - tv_now.tv_usec) / 1000;
-    if (dt <= 0)
+    int dt = (tv_until.tv_sec  - tv_now.tv_sec ) * 1000 +
+             (tv_until.tv_usec - tv_now.tv_usec) / 1000;
+    if (dt <= 0 || !aosd->shown)
       break;
 
     struct pollfd pollfd = { ConnectionNumber(aosd->display), POLLIN, 0 };
@@ -121,19 +129,20 @@ aosd_main_until(Aosd* aosd, struct timeval* until)
       }
     }
     else
-      aosd_main_iterations(aosd);
+      aosd_loop_once(aosd);
   }
 }
 
 typedef struct
 {
+  int width, height;
   cairo_surface_t* surface;
   float alpha;
   RenderCallback user_render;
 } AosdFlashData;
 
 static void
-flash_render(Aosd* aosd, cairo_t* cr, void* data)
+flash_render(cairo_t* cr, void* data)
 {
   AosdFlashData* flash = data;
 
@@ -142,9 +151,9 @@ flash_render(Aosd* aosd, cairo_t* cr, void* data)
   {
     cairo_t* rendered_cr;
     flash->surface = cairo_surface_create_similar(cairo_get_target(cr),
-        CAIRO_CONTENT_COLOR_ALPHA, aosd->width, aosd->height);
+        CAIRO_CONTENT_COLOR_ALPHA, flash->width, flash->height);
     rendered_cr = cairo_create(flash->surface);
-    flash->user_render.render_cb(aosd, rendered_cr, flash->user_render.data);
+    flash->user_render.render_cb(rendered_cr, flash->user_render.data);
     cairo_destroy(rendered_cr);
   }
 
@@ -154,69 +163,72 @@ flash_render(Aosd* aosd, cairo_t* cr, void* data)
   cairo_paint_with_alpha(cr, flash->alpha);
 }
 
-/* we don't need to free the flashdata object, because we stack-allocate that.
- * but we do need to let the old user data free itself... */
-static void
-flash_destroy(void* data)
-{
-  AosdFlashData* flash = data;
-  if (flash->user_render.data_destroyer)
-    flash->user_render.data_destroyer(flash->user_render.data);
-}
-
 void
-aosd_flash(Aosd* aosd, int fade_ms, int total_display_ms)
+aosd_flash(Aosd* aosd,
+    unsigned fade_in_ms, unsigned full_ms, unsigned fade_out_ms)
 {
+  if (aosd == NULL ||
+      (fade_in_ms == 0 &&
+       full_ms == 0 &&
+       fade_out_ms == 0))
+    return;
+
   AosdFlashData flash = {0};
   memcpy(&flash.user_render, &aosd->renderer, sizeof(RenderCallback));
-  aosd_set_renderer(aosd, flash_render, &flash, flash_destroy);
-
-  aosd_show(aosd);
-
-  const int STEP_MS = 50;
-  const float dalpha = 1.0 / (fade_ms / (float)STEP_MS);
-  struct timeval tv_nextupdate;
-
-  /* fade in */
-  for (flash.alpha = 0; flash.alpha < 1.0; flash.alpha += dalpha)
-  {
-    if (flash.alpha > 1.0)
-      flash.alpha = 1.0;
-    aosd_render(aosd);
-
-    gettimeofday(&tv_nextupdate, NULL);
-    tv_nextupdate.tv_usec += STEP_MS * 1000;
-    aosd_main_until(aosd, &tv_nextupdate);
-  }
-
-  /* full display */
-  flash.alpha = 1.0;
-  aosd_render(aosd);
-
-  gettimeofday(&tv_nextupdate, NULL);
-  tv_nextupdate.tv_usec += (total_display_ms - (2 * fade_ms)) * 1000;
-  aosd_main_until(aosd, &tv_nextupdate);
-
-  /* fade out */
-  for (flash.alpha = 1.0; flash.alpha > 0.0; flash.alpha -= dalpha)
-  {
-    aosd_render(aosd);
-
-    gettimeofday(&tv_nextupdate, NULL);
-    tv_nextupdate.tv_usec += STEP_MS * 1000;
-    aosd_main_until(aosd, &tv_nextupdate);
-  }
-
+  aosd_set_renderer(aosd, flash_render, &flash);
   flash.alpha = 0;
-  aosd_render(aosd);
+  flash.width = aosd->width;
+  flash.height = aosd->height;
 
-  /* display for another half-second,
-   * because otherwise the fade out attracts your eye
-   * and then you'll see a flash while it repaints where the aosd was.
-   */
-  gettimeofday(&tv_nextupdate, NULL);
-  tv_nextupdate.tv_usec += 500 * 1000;
-  aosd_main_until(aosd, &tv_nextupdate);
+  float step;
+
+  if (!aosd->shown)
+  {
+    aosd_show(aosd);
+    aosd_loop_once(aosd);
+  }
+
+  if (fade_in_ms != 0 && aosd->shown)
+  {
+    step = 1.0 / (float)fade_in_ms;
+    for (; flash.alpha < 1.0 && aosd->shown; flash.alpha += step)
+    {
+      aosd_render(aosd);
+      aosd_loop_for(aosd, step);
+    }
+  }
+
+  flash.alpha = 1.0;
+
+  if (full_ms != 0 && aosd->shown)
+  {
+    aosd_render(aosd);
+    aosd_loop_for(aosd, full_ms);
+  }
+
+  if (fade_out_ms != 0 && aosd->shown)
+  {
+    step = 1.0 / (float)fade_out_ms;
+    for (; flash.alpha > 0.0 && aosd->shown; flash.alpha -= step)
+    {
+      aosd_render(aosd);
+      aosd_loop_for(aosd, step);
+    }
+  }
+
+  if (aosd->shown)
+  {
+    aosd_hide(aosd);
+    aosd_loop_once(aosd);
+  }
+
+  /* restore initial renderer */
+  aosd_set_renderer(aosd,
+      flash.user_render.render_cb,
+      flash.user_render.data);
+
+  /* free some resources */
+  cairo_surface_destroy(flash.surface);
 }
 
 /* vim: set ts=2 sw=2 et : */

@@ -34,7 +34,7 @@ make_window(Aosd* aosd)
     if (aosd->background.set)
     {
       XFreePixmap(dsp, aosd->background.pixmap);
-      aosd->background.set = 0;
+      aosd->background.set = False;
     }
 
     if (aosd->colormap != None)
@@ -96,6 +96,8 @@ make_window(Aosd* aosd)
   set_window_properties(dsp, aosd->win);
   if (aosd->width && aosd->height)
     aosd_set_geometry(aosd, aosd->x, aosd->y, aosd->width, aosd->height);
+  if (aosd->shown)
+    aosd_show(aosd);
 }
 
 Pixmap

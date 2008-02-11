@@ -12,6 +12,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <cairo/cairo-xlib-xrender.h>
 
@@ -68,6 +69,24 @@ aosd_get_name(Aosd* aosd, XClassHint* result)
   XGetClassHint(aosd->display, aosd->win, result);
 }
 
+void
+aosd_get_names(Aosd* aosd, char** res_name, char** res_class)
+{
+  if (aosd == NULL)
+    return;
+
+  XClassHint ret;
+  aosd_get_name(aosd, &ret);
+
+  if (res_name != NULL)
+    *res_name = strdup(ret.res_name);
+  XFree(ret.res_name);
+
+  if (res_class != NULL)
+    *res_class = strdup(ret.res_class);
+  XFree(ret.res_class);
+}
+
 AosdTransparency
 aosd_get_transparency(Aosd* aosd)
 {
@@ -83,11 +102,35 @@ aosd_get_geometry(Aosd* aosd, int* x, int* y, int* width, int* height)
   if (x != NULL)
     *x = (aosd == NULL) ? 0 : aosd->x;
   if (y != NULL)
-    *y = (aosd == NULL) ? 0 : aosd->x;
+    *y = (aosd == NULL) ? 0 : aosd->y;
   if (width != NULL)
     *width  = (aosd == NULL) ? 0 : aosd->width;
   if (height != NULL)
     *height = (aosd == NULL) ? 0 : aosd->height;
+}
+
+void
+aosd_get_screen_size(Aosd* aosd, int* width, int* height)
+{
+  if (aosd == NULL)
+    return;
+
+  Display* dsp = aosd->display;
+  int scr = aosd->screen_num;
+
+  if (width != NULL)
+    *width = DisplayWidth(dsp, scr);
+  if (height != NULL)
+    *height = DisplayHeight(dsp, scr);
+}
+
+Bool
+aosd_get_is_shown(Aosd* aosd)
+{
+  if (aosd == NULL)
+    return False;
+
+  return aosd->shown;
 }
 
 void
@@ -101,8 +144,8 @@ aosd_set_name(Aosd* aosd, XClassHint* name)
   if (name == NULL)
   {
     name = XAllocClassHint();
-    name->res_class = "Atheme";
     name->res_name = "libaosd";
+    name->res_class = "Atheme";
     flag = True;
   }
 
@@ -113,22 +156,31 @@ aosd_set_name(Aosd* aosd, XClassHint* name)
 }
 
 void
+aosd_set_names(Aosd* aosd, char* res_name, char* res_class)
+{
+  if (aosd == NULL)
+    return;
+
+  XClassHint name = {res_name, res_class};
+  aosd_set_name(aosd, &name);
+}
+
+void
 aosd_set_transparency(Aosd* aosd, AosdTransparency mode)
 {
-  XClassHint* name;
-
   if (aosd == NULL || aosd->mode == mode)
     return;
 
   // we have to preserve window name
-  name = XAllocClassHint();
-  aosd_get_name(aosd, name);
+  XClassHint name;
+  aosd_get_name(aosd, &name);
 
   aosd->mode = mode;
   make_window(aosd);
 
-  aosd_set_name(aosd, name);
-  XFree(name);
+  aosd_set_name(aosd, &name);
+  XFree(name.res_name);
+  XFree(name.res_class);
 }
 
 void
@@ -137,39 +189,78 @@ aosd_set_geometry(Aosd* aosd, int x, int y, int width, int height)
   if (aosd == NULL)
     return;
 
-  Display* dsp = aosd->display;
-  int scr = aosd->screen_num;
-  const int dsp_width  = DisplayWidth(dsp, scr);
-  const int dsp_height = DisplayHeight(dsp, scr);
-
-  if (x == AOSD_COORD_CENTER)
-    x = (dsp_width - width) / 2;
-  else if (x < 0)
-    x = (dsp_width - width) + x;
-
-  if (y == AOSD_COORD_CENTER)
-    y = (dsp_height - height) / 2;
-  else if (y < 0)
-    y = (dsp_height - height) + y;
-
   aosd->x      = x;
   aosd->y      = y;
   aosd->width  = width;
   aosd->height = height;
 
-  XMoveResizeWindow(dsp, aosd->win, x, y, width, height);
+  XMoveResizeWindow(aosd->display, aosd->win, x, y, width, height);
 }
 
 void
-aosd_set_renderer(Aosd* aosd, AosdRenderer renderer, void* user_data,
-    void (*user_data_d)(void*))
+aosd_set_position(Aosd* aosd, unsigned pos, int width, int height)
+{
+  if (aosd == NULL)
+    return;
+
+  if (pos > 8)
+    pos = 4;
+
+  aosd_set_position_with_offset(aosd, pos % 3, pos / 3, width, height, 0, 0);
+}
+
+void
+aosd_set_position_offset(Aosd* aosd, int x_offset, int y_offset)
+{
+  if (aosd == NULL)
+    return;
+
+  aosd_set_geometry(aosd, aosd->x + x_offset, aosd->y + y_offset,
+      aosd->width, aosd->height);
+}
+
+void
+aosd_set_position_with_offset(Aosd* aosd,
+    AosdCoordinate abscissa, AosdCoordinate ordinate, int width, int height,
+    int x_offset, int y_offset)
+{
+  if (aosd == NULL)
+    return;
+
+  int dsp_width, dsp_height;
+
+  aosd_get_screen_size(aosd, &dsp_width, &dsp_height);
+
+  int x = dsp_width - width;
+  int y = dsp_height - height;
+
+  if (abscissa == COORDINATE_MINIMUM)
+    x = 0;
+  else
+    if (abscissa == COORDINATE_CENTER)
+      x /= 2;
+
+  x += x_offset;
+
+  if (ordinate == COORDINATE_MINIMUM)
+    y = 0;
+  else
+    if (ordinate == COORDINATE_CENTER)
+      y /= 2;
+
+  y += y_offset;
+
+  aosd_set_geometry(aosd, x, y, width, height);
+}
+
+void
+aosd_set_renderer(Aosd* aosd, AosdRenderer renderer, void* user_data)
 {
   if (aosd == NULL)
     return;
 
   aosd->renderer.render_cb = renderer;
   aosd->renderer.data = user_data;
-  aosd->renderer.data_destroyer = user_data_d;
 }
 
 void
@@ -180,6 +271,15 @@ aosd_set_mouse_event_cb(Aosd* aosd, AosdMouseEventCb cb, void* user_data)
 
   aosd->mouse_processor.mouse_event_cb = cb;
   aosd->mouse_processor.data = user_data;
+}
+
+void
+aosd_set_hide_upon_mouse_event(Aosd* aosd, Bool enable)
+{
+  if (aosd == NULL)
+    return;
+
+  aosd->mouse_hide = enable;
 }
 
 void
@@ -230,7 +330,7 @@ aosd_render(Aosd* aosd)
 
     /* draw some stuff */
     cairo_t* cr = cairo_create(surf);
-    aosd->renderer.render_cb(aosd, cr, aosd->renderer.data);
+    aosd->renderer.render_cb(cr, aosd->renderer.data);
     cairo_destroy(cr);
     cairo_surface_destroy(surf);
   }
@@ -250,7 +350,7 @@ aosd_render(Aosd* aosd)
 void
 aosd_show(Aosd* aosd)
 {
-  if (aosd == NULL)
+  if (aosd == NULL || aosd->shown)
     return;
 
   if (aosd->mode == TRANSPARENCY_FAKE)
@@ -258,23 +358,25 @@ aosd_show(Aosd* aosd)
     if (aosd->background.set)
     {
       XFreePixmap(aosd->display, aosd->background.pixmap);
-      aosd->background.set = 0;
+      aosd->background.set = False;
     }
     aosd->background.pixmap = take_snapshot(aosd);
-    aosd->background.set = 1;
+    aosd->background.set = True;
   }
 
   aosd_render(aosd);
   XMapRaised(aosd->display, aosd->win);
+  aosd->shown = True;
 }
 
 void
 aosd_hide(Aosd* aosd)
 {
-  if (aosd == NULL)
+  if (aosd == NULL || !aosd->shown)
     return;
 
   XUnmapWindow(aosd->display, aosd->win);
+  aosd->shown = False;
 }
 
 /* vim: set ts=2 sw=2 et : */

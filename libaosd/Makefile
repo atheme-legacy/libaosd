@@ -1,18 +1,16 @@
 LIB = ${LIB_PREFIX}aosd${LIB_SUFFIX}
-LIB_MAJOR = 1
+LIB_MAJOR = 2
 LIB_MINOR = 0
 
 SRCS = aosd.c \
        aosd-internal.c \
-       aosd-main.c \
-       aosd-text.c
+       aosd-main.c
 
-INCLUDES = aosd.h \
-	   aosd-text.h
+INCLUDES = aosd.h
 
 include ../buildsys.mk
 include ../extra.mk
 
-CPPFLAGS += ${LIB_CPPFLAGS} ${AUX_CFLAGS} -I..
+CPPFLAGS += ${LIB_CPPFLAGS} ${X_CFLAGS} ${CAIRO_CFLAGS} -I..
 CFLAGS += ${LIB_CFLAGS}
-LIBS += ${AUX_LDFLAGS}
+LIBS += ${X_LIBS} ${CAIRO_LIBS}

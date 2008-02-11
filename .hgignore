@@ -10,6 +10,7 @@ configure
 extra.mk
 install-sh
 libaosd.pc
+libaosd-text.pc
 .deps
 *.a
 *.o
