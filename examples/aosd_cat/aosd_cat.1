@@ -1,61 +1,91 @@
 .TH AOSD "1" "November 2007" "aosd_cat" "User Commands"
 .SH NAME
-aosd_cat \- displays text on the screen
+aosd_cat - displays text on the screen
 .SH SYNOPSIS
-.B aosd_cat
-[\fIOPTION\fR] [\fITEXT\fR]...
+.B aosd_cat [\fIOPTION\fB...]
 .SH DESCRIPTION
-Display TEXT, or standard input, on top of display.
-.HP
-\fB\-F\fR, \fB\-\-fontdesc\fR=\fIFONT\fR Use font description (default: "Trebuchet 30")
+Displays UTF-8 text in a transparent OSD frame.
 .TP
-\fB\-r\fR, \fB\-\-red\fR=\fILEVEL\fR
-Red level, default is 0.00
+For parameters marked with asterisk (*) valid range is 0-255. Those, which are marked with double asterisk (**), accept negative values. Coloring parameters are specified in either #RGB format or from rgb.txt. Timing parameters are specified in milliseconds. Scrollback limits are cancelled with 0 parameter. Age is in seconds.
 .TP
-\fB\-g\fR, \fB\-\-green\fR=\fILEVEL\fR
-Green level, default is 1.00
+Geometry Options:
 .TP
-\fB\-b\fR, \fB\-\-blue\fR=\fILEVEL\fR
-Blue level, default is 0.00
+\fB-p\fR, \fB--position\fR
+Sets the OSD window position. Valid range is 0-8, where 0 is top-left corner
+and 8 is bottom-right corner. Default value is \fB6\fR.
 .TP
-\fB\-a\fR, \fB\-\-alpha\fR=\fILEVEL\fR
-Alpha level, default is 1.00
+\fB-x\fR, \fB--x-offset\fR **
+Sets the x-axis window offset. Default value is \fB50\fR.
 .TP
-\fB\-x\fR, \fB\-\-xpos\fR=\fIOFFSET\fR
-X\-position on screen, default is \fB\-50\fR
+\fB-y\fR, \fB--y-offset\fR **
+Sets the y-axis window offset. Default value is \fB-50\fR.
 .TP
-\fB\-y\fR, \fB\-\-ypos\fR=\fIOFFSET\fR
-Y\-position on screen, default is \fB\-50\fR
+\fB-e\fR, \fB--shadow-offset\fR **
+Sets the shadow offset. Default value is \fB2\fR.
 .TP
-\fB\-d\fR, \fB\-\-delay\fR=\fITIME\fR
-Show for specified time (milliseconds), default is 1500
+\fB-d\fR, \fB--padding\fR *
+Sets the margin from the edge to the contents. Default value is \fB0\fR.
 .TP
-\fB\-e\fR, \fB\-\-fade\fR=\fITIME\fR
-Time to spend fading, default is 300
+Appearance Options:
 .TP
-\fB\-h\fR, \fB\-\-help\fR
-Show this help
-.HP
-\fB\-s\fR, \fB\-\-shadow\fR=\fISHADOW\fR Offset of shadow, default is 2 (0 is no shadow)
+\fB-t\fR, \fB--transparency\fR
+Sets the transparency mode. 0=none, 1=fake, 2=composite. Default value is \fB2\fR.
 .TP
-\fB\-S\fR, \fB\-\-shadowalpha\fR=\fIlevel\fR
-Alpha level of shadow, default is 0.50
+\fB-n\fR, \fB--font\fR
+Sets the OSD font. No default value.
 .TP
-\fB\-f\fR, \fB\-\-file\fR[=\fIFILE\fR]
-Read from file rather than command line (use \- or omit FILE for stdin)
+\fB-w\fR, \fB--width\fR
+Sets the OSD wrapping width in pixels. If set to zero, text will be
+wrapped on screen width or will not be wrapped at all if other
+parameters make it impossible to layout correctly. Default value is \fB0\fR.
 .TP
-\fB\-t\fR, \fB\-\-text\fR[=\fITEXT\fR]
-Display TEXT (or omit TEXT for example text)
+Coloring Options:
 .TP
-\fB\-m\fR, \fB\-\-maxlen\fR=\fILEN\fR
-Maximum length of any line displayed when \fB\-t\fR not specified, default is 55
+\fB-B\fR, \fB--back-color\fR
+Sets the background color. No default value.
 .TP
-\fB\-l\fR, \fB\-\-lines\fR=\fIn\fR
-Scroll using n lines. Default is 1.
+\fB-S\fR, \fB--shadow-color\fR
+Sets the shadow color. Default value is \fBblack\fR.
 .TP
-\fB\-G\fR, \fB\-\-age\fR=\fITIME\fR
-Time in milliseconds before old scroll lines are discarded,
-use 0 to ignore, default is 0
-(Note that at most min{AGE/DELAY, LINES} will ever be shown at once)
+\fB-R\fR, \fB--fore-color\fR
+Sets the foreground color. Default value is \fBgreen\fR.
+.TP
+Opacity Options:
+.TP
+\fB-b\fR, \fB--back-opacity\fR *
+Sets the background opacity. Default value is \fB0\fR.
+.TP
+\fB-s\fR, \fB--shadow-opacity\fR *
+Sets the shadow opacity. Default value is \fB192\fR.
+.TP
+\fB-r\fR, \fB--fore-opacity\fR *
+Sets the foreground opacity. Default value is \fB255\fR.
+.TP
+Timing Options:
+.TP
+\fB-f,\fR \fB--fade-in\fR
+Sets the fade in time. Default value is \fB300\fR.
+.TP
+\fB-u,\fR \fB--fade-full\fR
+Sets the time to show with full opacity. Default value is \fB3000\fR.
+.TP
+\fB-o,\fR \fB--fade-out\fR
+Sets the fade out time. Default value is \fB300\fR.
+.TP
+Scrollback Options:
+.TP
+\fB-a,\fR \fB--age\fR
+Sets the line age removal limit. Default value is \fB0\fR.
+.TP
+\fB-l,\fR \fB--lines\fR
+Sets the line amount removal limit. Default value is \fB1\fR.
+.TP
+Application Options:
+.TP
+\fB-i,\fR \fB--input\fR
+Sets the input text source. Default value is \fB-\fR.
 .SH BUGS
-This manpage may be out of date. Use \-\-help to get the latest options.
+This manpage may be out of date. Use --help to get the latest options.
+
+Thank you for using libaosd!
+Please send bug reports to: http://bugzilla.atheme.org/
