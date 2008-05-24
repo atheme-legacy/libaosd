@@ -156,12 +156,12 @@ aosd_set_name(Aosd* aosd, XClassHint* name)
 }
 
 void
-aosd_set_names(Aosd* aosd, char* res_name, char* res_class)
+aosd_set_names(Aosd* aosd, const char* res_name, const char* res_class)
 {
   if (aosd == NULL)
     return;
 
-  XClassHint name = {res_name, res_class};
+  XClassHint name = {(char*)res_name, (char*)res_class};
   aosd_set_name(aosd, &name);
 }
 
