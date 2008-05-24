@@ -71,7 +71,7 @@ Bool aosd_get_is_shown(Aosd* aosd);
 
 /* object configurators */
 void aosd_set_name(Aosd* aosd, XClassHint* name);
-void aosd_set_names(Aosd* aosd, char* res_name, char* res_class);
+void aosd_set_names(Aosd* aosd, const char* res_name, const char* res_class);
 void aosd_set_transparency(Aosd* aosd, AosdTransparency mode);
 void aosd_set_geometry(Aosd* aosd, int x, int y, int width, int height);
 void aosd_set_position(Aosd* aosd, unsigned pos, int width, int height);
