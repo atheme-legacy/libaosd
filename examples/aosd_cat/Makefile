@@ -2,6 +2,8 @@ PROG = aosd_cat
 
 SRCS = aosd_cat.c
 
+MAN = aosd_cat.1
+
 include ../../buildsys.mk
 include ../../extra.mk
 
