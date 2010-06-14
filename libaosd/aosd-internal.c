@@ -143,11 +143,19 @@ set_window_properties(Display* dsp, Window win)
   XChangeProperty(dsp, win, mwm_hints, mwm_hints, 32,
       PropModeReplace, (unsigned char *)&mwm_hints_setting, 4);
 
+  Atom win_type = XInternAtom(dsp, "_NET_WM_WINDOW_TYPE", False);
+  Atom win_type_notif[] = {
+    XInternAtom(dsp, "_NET_WM_WINDOW_TYPE_NOTIFICATION", False),
+  };
+  XChangeProperty(dsp, win, win_type, XA_ATOM, 32,
+      PropModeReplace, (unsigned char *)&win_type_notif, 1);
+
   /* always on top, not in taskbar or pager. */
   Atom win_state = XInternAtom(dsp, "_NET_WM_STATE", False);
   Atom win_state_setting[] =
   {
     XInternAtom(dsp, "_NET_WM_STATE_ABOVE", False),
+    XInternAtom(dsp, "_NET_WM_STATE_STICKY", False),
     XInternAtom(dsp, "_NET_WM_STATE_SKIP_TASKBAR", False),
     XInternAtom(dsp, "_NET_WM_STATE_SKIP_PAGER", False)
   };
