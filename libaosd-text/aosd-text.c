@@ -280,14 +280,18 @@ aosd_text_get_size(TextRenderData* trd, unsigned* width, unsigned* height)
 
   pango_layout_get_size_aosd(trd->lay, width, height, &trd->lbearing);
 
-  *width += 2 * trd->geom.x_offset;
-  *height += 2 * trd->geom.y_offset;
+  if (width != NULL)
+    *width += 2 * trd->geom.x_offset;
+  if (height != NULL)
+    *height += 2 * trd->geom.y_offset;
 
   if (trd->shadow.opacity != 0 && trd->fore.opacity != 0 &&
       (trd->shadow.x_offset != 0 || trd->shadow.y_offset != 0))
   {
-    *width += abs(trd->shadow.x_offset);
-    *height += abs(trd->shadow.y_offset);
+    if (width != NULL)
+      *width += abs(trd->shadow.x_offset);
+    if (height != NULL)
+      *height += abs(trd->shadow.y_offset);
   }
 }
 
