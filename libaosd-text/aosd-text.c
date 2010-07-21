@@ -1,6 +1,6 @@
 /* aosd -- OSD with transparency, cairo, and pango.
  *
- * Copyright (C) 2007 Eugene Paskevich <eugene@raptor.kiev.ua>
+ * Copyright (C) 2007,2010 Eugene Paskevich <eugene@raptor.kiev.ua>
  */
 
 #include <string.h>
@@ -46,7 +46,7 @@ pango_layout_get_size_aosd(PangoLayout* lay,
 }
 
 void
-pango_layout_set_text_aosd(PangoLayout* lay, char* text)
+pango_layout_set_text_aosd(PangoLayout* lay, const char* text)
 {
   if (lay == NULL || text == NULL)
     return;

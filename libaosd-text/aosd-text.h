@@ -1,6 +1,6 @@
 /* aosd -- OSD with transparency, cairo, and pango.
  *
- * Copyright (C) 2007 Eugene Paskevich <eugene@raptor.kiev.ua>
+ * Copyright (C) 2007,2010 Eugene Paskevich <eugene@raptor.kiev.ua>
  */
 
 #ifndef __AOSD_TEXT_H__
@@ -24,7 +24,7 @@ void pango_layout_get_size_aosd(PangoLayout* lay,
     unsigned* width, unsigned* height, int* lbearing);
 
 // Converts all \n occurrences into U+2028 symbol
-void pango_layout_set_text_aosd(PangoLayout* lay, char* text);
+void pango_layout_set_text_aosd(PangoLayout* lay, const char* text);
 void pango_layout_set_attr_aosd(PangoLayout* lay, PangoAttribute* attr);
 void pango_layout_set_font_aosd(PangoLayout* lay, const char* font_desc);
 
@@ -42,13 +42,13 @@ typedef struct
 
   struct
   {
-    char* color;
+    const char* color;
     guint8 opacity;
   } back;
 
   struct
   {
-    char* color;
+    const char* color;
     guint8 opacity;
     gint8 x_offset;
     gint8 y_offset;
@@ -56,7 +56,7 @@ typedef struct
 
   struct
   {
-    char* color;
+    const char* color;
     guint8 opacity;
   } fore;
 } TextRenderData;
