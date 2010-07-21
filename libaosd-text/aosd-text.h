@@ -26,7 +26,7 @@ void pango_layout_get_size_aosd(PangoLayout* lay,
 // Converts all \n occurrences into U+2028 symbol
 void pango_layout_set_text_aosd(PangoLayout* lay, char* text);
 void pango_layout_set_attr_aosd(PangoLayout* lay, PangoAttribute* attr);
-void pango_layout_set_font_aosd(PangoLayout* lay, char* font_desc);
+void pango_layout_set_font_aosd(PangoLayout* lay, const char* font_desc);
 
 typedef struct
 {

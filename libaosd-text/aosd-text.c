@@ -123,7 +123,7 @@ pango_layout_set_attr_aosd(PangoLayout* lay, PangoAttribute* attr)
 }
 
 void
-pango_layout_set_font_aosd(PangoLayout* lay, char* font_desc)
+pango_layout_set_font_aosd(PangoLayout* lay, const char* font_desc)
 {
   if (lay == NULL || font_desc == NULL)
     return;
