@@ -6,4 +6,4 @@ include ../../buildsys.mk
 include ../../extra.mk
 
 CPPFLAGS += ${CAIRO_CFLAGS} -I../.. -I../../libaosd
-LDFLAGS += -L../../libaosd -laosd
+LDFLAGS += ${CAIRO_LIBS} -L../../libaosd -laosd

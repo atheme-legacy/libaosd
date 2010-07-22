@@ -8,4 +8,4 @@ include ../../buildsys.mk
 include ../../extra.mk
 
 CPPFLAGS += ${PANGOCAIRO_CFLAGS} ${GLIB_CFLAGS} -I../../ -I../../libaosd -I../../libaosd-text
-LDFLAGS += ${GLIB_LIBS} -L../../libaosd -laosd -L../../libaosd-text -laosd-text
+LDFLAGS += ${PANGOCAIRO_LIBS} ${GLIB_LIBS} -L../../libaosd -laosd -L../../libaosd-text -laosd-text
