@@ -30,7 +30,7 @@ if [ "x$2" = "x--automatic" ]; then
 	AUTOMATIC="yes"
 fi
 
-TIP=`hg tip --template "#rev#:#node|short#"`
+TIP=`hg tip --template "{rev}:{node|short}"`
 
 WRKDIR=`pwd`
 
@@ -45,6 +45,8 @@ echo
 echo "Building root: $RELEASENAME/"
 hg archive $RELEASENAME
 cd $RELEASENAME
+rm -rf .hg_archival.txt .hgignore .hgtags
+rm -rf scripts
 sh autogen.sh
 rm -rf autogen.sh autom4te.cache
 
@@ -85,12 +87,7 @@ if [ "x$AUTOMATIC" != "xyes" ]; then
 fi
 
 if [ "x$PUBLISH" = "xyes" ]; then
-	scp $RELEASENAME.tgz distfiles-master.atheme.org:/srv/distfiles
-	scp $RELEASENAME.tbz2 distfiles-master.atheme.org:/srv/distfiles
-
-	echo
-	echo "The releases have been published, and will be available to the entire"
-	echo "distribution network within 15 minutes."
+	scp $RELEASENAME.tgz distfiles.atheme.org:/var/www/distfiles.atheme.org/
 fi
 
 echo
