@@ -1,6 +1,6 @@
 AC_PREREQ(2.54)
 
-AC_INIT([libaosd], [0.2.5], [http://bugzilla.atheme.org/])
+AC_INIT([libaosd], [0.2.5], [http://jira.atheme.org/])
 AC_CONFIG_HEADER([config.h])
 
 AC_CANONICAL_HOST
@@ -103,6 +103,7 @@ else
 fi
 
 AC_SUBST(PACKAGES)
+AC_SUBST(PACKAGE_BUGREPORT)
 AC_SUBST(EXAMPLES)
 AC_SUBST(X_CFLAGS)
 AC_SUBST(X_LIBS)
@@ -120,6 +121,7 @@ AC_CONFIG_FILES(
      buildsys.mk
      extra.mk
      libaosd.pc
+     examples/aosd_cat/aosd_cat.1
      ${TEXT_PKGCONF}
     ]
 )

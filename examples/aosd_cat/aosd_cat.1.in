@@ -88,4 +88,4 @@ Sets the input text source. Default value is \fB-\fR.
 This manpage may be out of date. Use --help to get the latest options.
 
 Thank you for using libaosd!
-Please send bug reports to: http://bugzilla.atheme.org/
+Please send bug reports to: @PACKAGE_BUGREPORT@
