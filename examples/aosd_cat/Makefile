@@ -4,6 +4,8 @@ SRCS = aosd_cat.c
 
 MAN = aosd_cat.1
 
+DISTCLEAN = aosd_cat.1
+
 include ../../buildsys.mk
 include ../../extra.mk
 
