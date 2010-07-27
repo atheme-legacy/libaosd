@@ -1,1 +1,2 @@
 - Add the Changelog.
+- The library should not call exit, but return the error instead.
