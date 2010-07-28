@@ -125,7 +125,7 @@ aosd_loop_for(Aosd* aosd, unsigned loop_ms)
       if (errno != EINTR)
       {
         perror("poll");
-        exit(1);
+        abort();
       }
     }
     else
