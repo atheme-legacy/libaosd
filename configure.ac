@@ -102,6 +102,9 @@ else
     enable_glib="no"
 fi
 
+# touch the .deps
+BUILDSYS_TOUCH_DEPS
+
 AC_SUBST(PACKAGES)
 AC_SUBST(PACKAGE_BUGREPORT)
 AC_SUBST(EXAMPLES)

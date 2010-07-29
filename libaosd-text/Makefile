@@ -8,6 +8,6 @@ INCLUDES = aosd-text.h
 include ../buildsys.mk
 include ../extra.mk
 
-CPPFLAGS += ${LIB_CPPFLAGS} ${PANGOCAIRO_CFLAGS} -I.. -I../libaosd
+CPPFLAGS += ${PANGOCAIRO_CFLAGS} -I.. -I../libaosd
 CFLAGS += ${LIB_CFLAGS}
 LIBS += ${PANGOCAIRO_LIBS} -L../libaosd -laosd
