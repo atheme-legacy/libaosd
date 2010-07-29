@@ -1,8 +1,9 @@
 include extra.mk
 
 SUBDIRS = libaosd ${TEXT_DIR} examples
-DISTCLEAN = autom4te.cache aclocal.m4 buildsys.mk config.h config.log \
-	    config.status extra.mk libaosd.pc ${TEXT_PKGCONF}
+DISTCLEAN = buildsys.mk extra.mk \
+	    config.h config.log config.status \
+	    libaosd.pc ${TEXT_PKGCONF}
 EXTRA = libaosd.pc ${TEXT_PKGCONF}
 
 include buildsys.mk
