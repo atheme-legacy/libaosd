@@ -1,0 +1,22 @@
+Changes in 0.2.7 ():
+-------------------------------
+*   As a library, we shouldn't call exit on X11 polling error, aborting now.
+
+Changes in 0.2.6 (22 Jul 2010):
+-------------------------------
+*   The OSD window is now sticky and of notification type.
+*   Fixed the API where variables are non-const for no reason.
+*   Fixed possible NULL dereference in aosd_text_get_size().
+
+Changes in 0.2.5 (02 Jun 2008):
+-------------------------------
+*   Fixed memory leak on X11 Colormap.
++   Added a manual page from the debian package.
+*   Constified the arguments in aosd_set_names().
+
+Changes in 0.2.4 (30 Jan 2008):
+-------------------------------
+
+*   aosd_cat has been rewritten from scratch. No attempt was made to preserve command line argument names or meaning, however.
+*   Tiny main loop fix.
+*   Fixed pango layout height calculation.
