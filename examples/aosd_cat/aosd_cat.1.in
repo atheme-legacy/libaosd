@@ -5,20 +5,28 @@ aosd_cat - displays text on the screen
 .B aosd_cat [\fIOPTION\fB...]
 .SH DESCRIPTION
 Displays UTF-8 text in a transparent OSD frame.
-.TP
-For parameters marked with asterisk (*) valid range is 0-255. Those, which are marked with double asterisk (**), accept negative values. Coloring parameters are specified in either #RGB format or from rgb.txt. Timing parameters are specified in milliseconds. Scrollback limits are cancelled with 0 parameter. Age is in seconds.
+.PP
+For parameters marked with asterisk (*) valid range is 0-255.
+Those, which are marked with double asterisk (**), accept negative values.
+Coloring parameters are specified in either #RGB format or from rgb.txt.
+Timing parameters are specified in milliseconds.
+Scrollback limits are cancelled with 0 parameter.
+Age is in seconds.
 .TP
 Geometry Options:
 .TP
 \fB\-p\fR, \fB\-\-position\fR
-Sets the OSD window position. Valid range is 0-8, where 0 is top-left corner
-and 8 is bottom-right corner. Default value is \fB6\fR.
+Sets the OSD window position. Or to be more precise, selects the point of the
+screen which is told to be the beginning of the coordinates (the 0,0 point)
+AND selects the point of the OSD window to collocate with it. Valid range is
+0-8, where 0 is top-left corner and 8 is bottom-right corner.
+Default value is \fB6\fR.
 .TP
 \fB\-x\fR, \fB\-\-x\-offset\fR **
-Sets the x-axis window offset. Default value is \fB50\fR.
+Sets the x-axis window offset from the (0,0) point. Default value is \fB50\fR.
 .TP
 \fB\-y\fR, \fB\-\-y\-offset\fR **
-Sets the y-axis window offset. Default value is \fB-50\fR.
+Sets the y-axis window offset from the (0,0) point. Default value is \fB-50\fR.
 .TP
 \fB\-e\fR, \fB\-\-shadow\-offset\fR **
 Sets the shadow offset. Default value is \fB2\fR.
