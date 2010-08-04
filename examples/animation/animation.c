@@ -13,6 +13,7 @@ typedef struct {
 static void
 round_rect(cairo_t* cr, int x, int y, int w, int h, int r)
 {
+  cairo_new_path(cr);
   cairo_move_to(cr, x+r, y);
   cairo_line_to(cr, x+w-r, y); /* top edge */
   cairo_curve_to(cr, x+w, y, x+w, y, x+w, y+r);
@@ -33,20 +34,15 @@ render(cairo_t* cr, void* data)
   RenderData* rdata = data;
 
   cairo_set_source_rgba(cr, rdata->alpha, 0, 0, 0.7);
-  cairo_new_path(cr);
   round_rect(cr, 0, 0, 180, 230, RADIUS);
   cairo_fill(cr);
 
   cairo_set_source_rgba(cr, 1, 1, 1, 1.0);
-  cairo_new_path(cr);
   round_rect(cr, 10, 10, 160, 210, RADIUS);
   cairo_stroke(cr);
 
-  cairo_save(cr);
-  cairo_set_source_rgba(cr, 1, 1, 1, 1.0);
   cairo_set_source_surface(cr, rdata->foot, 20, 20);
   cairo_paint(cr);
-  cairo_restore(cr);
 }
 
 int main(int argc, char* argv[])
