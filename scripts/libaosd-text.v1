@@ -1,0 +1,19 @@
+<version>
+    0.2.6
+</version>
+
+<headers>
+    /home/eugene/libaosd-0.2.6/include/libaosd/aosd-text.h
+</headers>
+
+<libs>
+    /home/eugene/libaosd-0.2.6/lib/libaosd-text.so.2.0.0
+</libs>
+
+<include_paths>
+    /home/eugene/libaosd-0.2.6/include/libaosd
+    /usr/include
+    /usr/include/X11
+    /usr/include/cairo
+    /usr/lib/glib-2.0/include
+</include_paths>

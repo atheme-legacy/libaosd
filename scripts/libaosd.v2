@@ -1,0 +1,19 @@
+<version>
+    0.2.7
+</version>
+
+<headers>
+    /home/eugene/libaosd-0.2.7/include/libaosd/aosd.h
+</headers>
+
+<libs>
+    /home/eugene/libaosd-0.2.7/lib/libaosd.so.2.0.0
+</libs>
+
+<include_paths>
+    /home/eugene/libaosd-0.2.7/include/libaosd
+    /usr/include
+    /usr/include/X11
+    /usr/include/cairo
+    /usr/lib/glib-2.0/include
+</include_paths>
