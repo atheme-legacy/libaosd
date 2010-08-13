@@ -25,6 +25,9 @@ fi
 PACKAGE="libaosd"
 AC_SUBST(PACKAGE)
 
+# Init the buildsys
+BUILDSYS_INIT
+
 # Checks for libraries.
 BUILDSYS_SHARED_LIB
 
