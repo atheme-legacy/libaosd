@@ -11,15 +11,11 @@ install-sh
 libaosd.pc
 libaosd-text.pc
 .deps
-
 examples/aosd_cat/aosd_cat.1
-
 examples/animation/animation
 examples/aosd_cat/aosd_cat
 examples/image/image
 examples/scroller/scroller
-
-syntax: glob
 *.a
 *.o
 *.dll
